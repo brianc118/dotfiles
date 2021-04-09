@@ -1,4 +1,10 @@
-source $LOCAL_ADMIN_SCRIPTS/master.vimrc
+function! SourceIfExists(file)
+  if filereadable(expand(a:file))
+    exe 'source' a:file
+  endif
+endfunction
+
+call SourceIfExists("$LOCAL_ADMIN_SCRIPTS/master.vimrc")
 
 call plug#begin('~/.vim/plugged')
 
@@ -139,37 +145,4 @@ nmap gd <Plug>(ale_go_to_definition)
 nmap gy <Plug>(ale_go_to_type_definition)
 nmap gr <Plug>(ale_find_references)
 
-"""-------------------------------------------"""
-"""                 Facebook                  """
-"""-------------------------------------------"""
-
-"format build files automatically
-autocmd BufWritePost TARGETS silent! exec
-  \ '!~/fbsource/tools/third-party/buildifier/run_buildifier.py -i %' | :e
-
-"buck build/test
-nnoremap <Leader>bb :Dispatch buck build $(buck query "owner('$(realpath %)')" \| head -1) \| cat<CR>
-nnoremap <Leader>bt :Dispatch buck test $(buck query "owner('$(realpath %)')" \| head -1) \| cat<CR>
-
-"bg
-let repo_path = system('hg root')
-let repo_initial = 'f'
-if repo_path =~# 'configerator'
-  let repo_initial = 'c'
-elseif repo_path =~# 'www'
-  let repo_initial = 't'
-elseif repo_path =~# 'fbcode'
-  let repo_initial = 'f'
-endif
-
-command! -bang -nargs=* Bg
-      \ call fzf#vim#grep(
-      \   repo_initial . 'bgs --color=on '.shellescape(<q-args>) .
-      \ '| sed "s,^[^/]*/,,"' .
-      \ '| sed "s#^#$(hg root)/#g"', 1,
-      \   <bang>0 ? fzf#vim#with_preview('up:60%')
-      \           : fzf#vim#with_preview('up:55%:hidden', '?'),
-      \   <bang>0)
-noremap gs :Bg <C-r><C-w><CR>
-
-
+call SourceIfExists("~/.fbvimrc")

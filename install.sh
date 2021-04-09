@@ -28,12 +28,12 @@ install_stuff () {
   $PKG_MANAGER_CMD $DEFAULT_PKGS
 
   if [[ ! -d ~/.zprezto ]]; then
-    git clone --recursive https://github.com/sorin-ionescu/prezto.git "~/.zprezto"
+    git clone --recursive https://github.com/sorin-ionescu/prezto.git ~/.zprezto
   fi
 
   if [[ ! -d ~/.fzf ]]; then
     git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-    ~/.fzf/install
+    ~/.fzf/install --all 
   fi
 
   if [[ ! -d ~/.vim/autoload/plug.vim ]]; then
