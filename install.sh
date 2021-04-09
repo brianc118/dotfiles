@@ -5,6 +5,8 @@ set -e
 DIR=~/dotfiles
 DEFAULT_PKGS="zsh vim neovim tmux git"
 
+cd ~
+
 install_stuff () {
   # Figure out which package manager to use
   platform=$(uname)
