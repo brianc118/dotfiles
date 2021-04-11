@@ -14,17 +14,17 @@ Plug 'tpope/vim-dispatch'
 Plug 'justinmk/vim-dirvish'
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
-Plug 'majutsushi/tagbar'
+"Plug 'majutsushi/tagbar'
 Plug 'rust-lang/rust.vim'
 Plug 'dense-analysis/ale'
 
-"if has('nvim')
-"  Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-"else
-"  Plug 'Shougo/deoplete.nvim'
-"  Plug 'roxma/nvim-yarp'
-"  Plug 'roxma/vim-hug-neovim-rpc'
-"endif
+if has('nvim')
+  Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+else
+  Plug 'Shougo/deoplete.nvim'
+  Plug 'roxma/nvim-yarp'
+  Plug 'roxma/vim-hug-neovim-rpc'
+endif
 
 "if has('nvim') || has('patch-8.0.902')
 "  Plug 'mhinz/vim-signify'
@@ -78,6 +78,11 @@ nnoremap <C-w>- 10<C-w>-
 nnoremap <C-w>< 10<C-w><
 nnoremap <C-w>> 10<C-w>>
 
+
+"""-------------------------------------------"""
+"""                  VISUALS                  """
+"""-------------------------------------------"""
+
 "Themes
 let g:vim_monokai_tasty_italic = 1
 colorscheme vim-monokai-tasty
@@ -94,55 +99,63 @@ function! LightlineCurrentDirectory(n) abort
   return fnamemodify(getcwd(tabpagewinnr(a:n), a:n), ':t')
 endfunction
 
-set autoread
-
-"Don't open FZF file in NERDTree buffer
-function! FZFOpen(command_str)
-  if (expand('%') =~# 'NERD_tree' && winnr('$') > 1)
-    exe "normal! \<c-w>\<c-w>"
-  endif
-  exe 'normal! ' . a:command_str . "\<cr>"
-endfunction
+"""-------------------------------------------"""
+"""                NAVIGATION                 """
+"""-------------------------------------------"""
 
 "FZF
-nnoremap <silent> <C-b> :call FZFOpen(':Buffers')<CR>
-nnoremap <silent> <C-g>g :call FZFOpen(':Ag')<CR>
-nnoremap <silent> <C-g>c :call FZFOpen(':Commands')<CR>
-nnoremap <silent> <C-g>L :call FZFOpen(':Lines')<CR>
-nnoremap <silent> <C-g>l :call FZFOpen(':BLines')<CR>
-nnoremap <silent> <C-p> :call FZFOpen(':Files')<CR>
+nnoremap <silent> <C-b> :Buffers<CR>
+nnoremap <silent> <C-g>g :Ag<CR>
+nnoremap <silent> <C-g>c :Commands<CR>
+nnoremap <silent> <C-g>L :Lines<CR>
+nnoremap <silent> <C-g>l :BLines<CR>
+nnoremap <silent> <C-p> :Files<CR>
 nmap <C-P> :FZF<CR>
-command! LightlineReload call LightlineReload()
 
-function! LightlineReload()
-  call lightline#init()
-  call lightline#colorscheme()
-  call lightline#update()
-endfunction
+"""-------------------------------------------"""
+"""             LANGUAGE SUPPORT              """
+"""-------------------------------------------"""
 
-"Ale
-"let g:ale_rust_analyzer_config = {
-"	\ 'rust': {
-"		\ 'all_targets': 1,
-"		\ 'build_on_save': 1,
-"		\ 'clippy_preference': 'on'
-"	\ }
-"	\ }
-let g:ale_rust_analyzer_executable = ''
+let g:ale_rust_analyzer_config = {
+      \ 'diagnostics': { 'disabled': ['unresolved-import'] },
+      \ 'cargo': { 'loadOutDirsFromCheck': v:true },
+      \ 'procMacro': { 'enable': v:true },
+      \ 'checkOnSave': { 'command': 'clippy', 'enable': v:true }
+      \ }
 let g:ale_python_pyls_executable = '/usr/local/bin/pyls-language-server'
-let g:ale_fixers = {'python': ['black'], 'cpp': ['clang-format'], "rust": ['rustfmt']}
-let g:ale_linters = {'python': ['flake8', 'pyls'], 'cpp': ['cppls_fbcode'], 'rust': ['analyzer'], 'thrift': ['fbthrift']}
-let g:ale_fix_on_save = 1
+let g:ale_fixers = {
+      \ 'python': ['black'],
+      \ 'cpp': ['clang-format'],
+      \ "rust": ['rustfmt']
+      \ }
+let g:ale_linters = {
+      \ 'python': ['flake8', 'pyls'],
+      \ 'cpp': ['cppls_fbcode'],
+      \ 'rust': ['analyzer'],
+      \ 'thrift': ['fbthrift'],
+      \ 'c': [],
+      \ }
+"let g:ale_fix_on_save = 1
 "let g:ale_lint_on_text_changed = 1
+
 let g:ale_set_balloons = 1
-"Signify
-"set updatetime=100
-
-"Deoplete
-"let g:deoplete#enable_at_startup = 1
-
 nmap gd <Plug>(ale_go_to_definition)
 nmap gy <Plug>(ale_go_to_type_definition)
 nmap gr <Plug>(ale_find_references)
+
+let g:deoplete#enable_at_startup = 1
+
+function! s:check_back_space() abort "{{{
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~ '\s'
+endfunction"}}}
+"tab completion
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ deoplete#manual_complete()
+
+"Signify
+"set updatetime=100
 
 call SourceIfExists("~/.fbvimrc")
