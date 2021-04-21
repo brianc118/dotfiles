@@ -126,7 +126,7 @@ let g:ale_python_pyls_executable = '/usr/local/bin/pyls-language-server'
 let g:ale_fixers = {
       \ 'python': ['black'],
       \ 'cpp': ['clang-format'],
-      \ "rust": ['rustfmt']
+      \ 'rust': ['rustfmt']
       \ }
 let g:ale_linters = {
       \ 'python': ['flake8', 'pyls'],
@@ -135,7 +135,7 @@ let g:ale_linters = {
       \ 'thrift': ['fbthrift'],
       \ 'c': [],
       \ }
-"let g:ale_fix_on_save = 1
+let g:ale_fix_on_save = 1
 "let g:ale_lint_on_text_changed = 1
 
 let g:ale_set_balloons = 1
