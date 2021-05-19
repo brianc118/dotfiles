@@ -17,6 +17,7 @@ Plug 'junegunn/fzf.vim'
 "Plug 'majutsushi/tagbar'
 Plug 'rust-lang/rust.vim'
 Plug 'dense-analysis/ale'
+Plug 'mg979/vim-visual-multi', {'branch': 'master'}
 
 if has('nvim')
   "Deoplete only for nvim
@@ -70,6 +71,7 @@ set laststatus=2          "For lightline in 1 buffer
 set list                  "Show tabs
 set hidden                "Set hidden so we don't get prompted to write when opening new file
 set nolist
+set mouse=
 
 "We want C-q for tmux prefix"
 noremap <C-q> <Nop>
@@ -77,6 +79,9 @@ nnoremap <C-w>+ 10<C-w>+
 nnoremap <C-w>- 10<C-w>-
 nnoremap <C-w>< 10<C-w><
 nnoremap <C-w>> 10<C-w>>
+
+"Turn of vim recording
+map q <Nop>
 
 
 """-------------------------------------------"""
@@ -122,21 +127,24 @@ let g:ale_rust_analyzer_config = {
       \ 'procMacro': { 'enable': v:true },
       \ 'checkOnSave': { 'command': 'clippy', 'enable': v:true }
       \ }
-let g:ale_python_pyls_executable = '/usr/local/bin/pyls-language-server'
+"let g:ale_python_pyls_executable = '/usr/local/bin/pyls-language-server'
 let g:ale_fixers = {
       \ 'python': ['black'],
       \ 'cpp': ['clang-format'],
-      \ 'rust': ['rustfmt']
+      \ 'rust': ['rustfmt'],
+      \ 'bzl': [],
       \ }
+let g:ale_cpp_cppls_fbcode_executable = '/home/brianc118/scripts/cppls'
 let g:ale_linters = {
-      \ 'python': ['flake8', 'pyls'],
       \ 'cpp': ['cppls_fbcode'],
       \ 'rust': ['analyzer'],
       \ 'thrift': ['fbthrift'],
       \ 'c': [],
       \ }
 let g:ale_fix_on_save = 1
-"let g:ale_lint_on_text_changed = 1
+"Some lsps are slow. Only lint on save.
+let g:ale_lint_on_text_changed = 'never'
+let g:ale_lint_on_insert_leave = 0
 
 let g:ale_set_balloons = 1
 nmap gd <Plug>(ale_go_to_definition)

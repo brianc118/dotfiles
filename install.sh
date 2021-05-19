@@ -6,7 +6,9 @@ DIR=~/dotfiles
 DEFAULT_PKGS="zsh vim neovim tmux git"
 DEFAULT_PKGS_DARWIN="zsh vim neovim tmux git tectonic wget"
 # Packages for building mosh
+MOSH_PKGS="autoconf automake protobuf-devel openssl-devel zlib-devel protobuf-compiler protobuf-c-compiler"
 MOSH_PKGS_DARWIN="protobuf boost pkg-config automake"
+PKGS="$DEFAULT_PKGS $MOSH_PKGS"
 PKGS_DARWIN="$DEFAULT_PKGS_DARWIN $MOSH_PKGS_DARWIN"
 
 install() {
@@ -15,7 +17,7 @@ install() {
   platform=$(uname)
   if [[ $platform == 'Linux' ]]; then
     if [[ -f /etc/redhat-release ]]; then
-      PKG_MANAGER_CMD="sudo dnf install"
+      PKG_MANAGER_CMD="sudo dnf install -y"
     elif [[ -f /etc/debian_version ]]; then
       PKG_MANAGER_CMD="sudo apt-get install"
     elif [[ -f /etc/arch-release ]]; then
@@ -24,7 +26,7 @@ install() {
       echo "Unhandled Linux distro -- giving up forever"
       exit 1
     fi
-    $PKG_MANAGER_CMD $DEFAULT_PKGS
+    $PKG_MANAGER_CMD $PKGS
   elif [[ $platform == 'Darwin' ]]; then
     if ! command -v brew &> /dev/null; then
       echo "Installing homebrew"
@@ -72,8 +74,8 @@ install() {
     cd ~
   fi
 
-  echo "Installing pynvim (for deoplete)"
-  python3 -m pip install --user --upgrade pynvim
+  #echo "Installing pynvim (for deoplete)"
+  #python3 -m pip install --user --upgrade pynvim
 }
 
 post_install () {
