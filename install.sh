@@ -2,13 +2,17 @@
 
 set -e
 
+# Repo must be in ~
 DIR=~/dotfiles
-DEFAULT_PKGS="zsh vim neovim tmux git"
+DEFAULT_PKGS_CENTOS="zsh vim neovim tmux git"
+DEFAULT_PKGS_DEBIAN="zsh vim neovim tmux git build-essential"
 DEFAULT_PKGS_DARWIN="zsh vim neovim tmux git tectonic wget"
 # Packages for building mosh
-MOSH_PKGS="autoconf automake protobuf-devel openssl-devel zlib-devel protobuf-compiler protobuf-c-compiler"
+MOSH_PKGS_CENTOS="autoconf automake protobuf-devel openssl-devel zlib-devel protobuf-compiler protobuf-c-compiler"
+MOSH_PKGS_DEBIAN="autoconf automake autoconf libtool g++ protobuf-compiler libprotobuf-dev libboost-dev libutempter-dev libncurses5-dev zlib1g-dev libio-pty-perl libssl-dev make pkg-config"
 MOSH_PKGS_DARWIN="protobuf boost pkg-config automake"
-PKGS="$DEFAULT_PKGS $MOSH_PKGS"
+PKGS_CENTOS="$DEFAULT_PKGS_CENTOS $MOSH_PKGS_CENTOS"
+PKGS_DEBIAN="$DEFAULT_PKGS_DEBIAN $MOSH_PKGS_DEBIAN"
 PKGS_DARWIN="$DEFAULT_PKGS_DARWIN $MOSH_PKGS_DARWIN"
 
 install() {
@@ -18,10 +22,13 @@ install() {
   if [[ $platform == 'Linux' ]]; then
     if [[ -f /etc/redhat-release ]]; then
       PKG_MANAGER_CMD="sudo dnf install -y"
+      PKGS="$PKGS_CENTOS"
     elif [[ -f /etc/debian_version ]]; then
       PKG_MANAGER_CMD="sudo apt-get install"
+      PKGS="$PKGS_DEBIAN"
     elif [[ -f /etc/arch-release ]]; then
       PKG_MANAGER_CMD="sudo pacman -S"
+      PKGS="$PKGS_CENTOS"
     else
       echo "Unhandled Linux distro -- giving up forever"
       exit 1
@@ -68,7 +75,7 @@ install() {
     git clone https://github.com/brianc118/mosh.git ~/.mosh
     cd ~/.mosh
     ./autogen.sh
-    ./configure
+    ./configure --disable-dependency-tracking
     make
     make install
     cd ~
