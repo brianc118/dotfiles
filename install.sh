@@ -47,7 +47,7 @@ install() {
 
   if [[ ! -d ~/.zprezto ]]; then
     echo "Installing prezto"
-    git clone --recursive https://github.com/sorin-ionescu/prezto.git ~/.zprezto
+    git clone --recursive https://github.com/brianc118/prezto.git ~/.zprezto
   fi
 
   # Could use package manager here but doesn't install key bindings by default
@@ -96,6 +96,7 @@ symlinks () {
   echo "Symlinks"
   cd $DIR
   ln -sf $DIR/.zshrc ~
+  ln -sf $DIR/.zpreztorc ~
   ln -sf $DIR/.vimrc ~
   ln -sf $DIR/.tmux.conf ~
   mkdir -p ~/.config/nvim
