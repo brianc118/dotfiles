@@ -81,6 +81,11 @@ install() {
     cd ~
   fi
 
+  if [[ ! -d ~/.tmux/plugins/tpm ]]; then
+    echo "Installing Tmux Plugin Manager"
+    git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+  fi
+
   #echo "Installing pynvim (for deoplete)"
   #python3 -m pip install --user --upgrade pynvim
 }
