@@ -18,6 +18,7 @@ Plug 'junegunn/fzf.vim'
 Plug 'rust-lang/rust.vim'
 Plug 'dense-analysis/ale'
 Plug 'mg979/vim-visual-multi', {'branch': 'master'}
+Plug 'vivien/vim-linux-coding-style'
 
 if has('nvim')
   "Deoplete only for nvim
@@ -80,6 +81,15 @@ nnoremap <C-w>- 10<C-w>-
 nnoremap <C-w>< 10<C-w><
 nnoremap <C-w>> 10<C-w>>
 
+map <C-a> <ESC>^
+imap <C-a> <ESC>I
+map <C-e> <ESC>$
+imap <C-e> <ESC>A
+inoremap <M-f> <ESC><Space>Wi
+inoremap <M-b> <Esc>Bi
+inoremap <M-d> <ESC>cW
+
+
 "Turn of vim recording
 map q <Nop>
 
@@ -141,7 +151,7 @@ let g:ale_linters = {
       \ 'thrift': ['fbthrift'],
       \ 'c': [],
       \ }
-let g:ale_fix_on_save = 1
+let g:ale_fix_on_save = 0
 "Some lsps are slow. Only lint on save.
 let g:ale_lint_on_text_changed = 'never'
 let g:ale_lint_on_insert_leave = 0
