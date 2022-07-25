@@ -95,6 +95,9 @@ post_install () {
   cd $DIR
   vim -es -u ~/.vimrc +PlugInstall +qa
   nvim -es -u ~/.config/nvim/init.vim +PlugInstall +qa
+
+  echo "You may also want to install"
+  echo "bat"
 }
 
 symlinks () {

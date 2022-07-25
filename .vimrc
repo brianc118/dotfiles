@@ -23,7 +23,11 @@ Plug 'vivien/vim-linux-coding-style'
 "Meta lsp
 Plug 'neovim/nvim-lspconfig'
 Plug 'nvim-lua/completion-nvim'
-Plug 'nvim-treesitter/nvim-treesitter'
+"trouble (lsp errors)
+Plug 'kyazdani42/nvim-web-devicons'
+Plug 'folke/trouble.nvim'
+"magical highlighting
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
 Plug 'jose-elias-alvarez/null-ls.nvim'
@@ -57,6 +61,8 @@ Plug 'saadparwaiz1/cmp_luasnip'
 Plug 'itchyny/lightline.vim'
 Plug 'patstockwell/vim-monokai-tasty'
 Plug 'elzr/vim-json'
+"monokai with tree-sitter
+Plug 'tanvirtin/monokai.nvim'
 
 call plug#end()
 
@@ -98,14 +104,18 @@ local on_attach = function(client, bufnr)
 end
 
 local nvim_lsp = require("lspconfig")
-local servers = { "rusty@meta", "pyls@meta", "pyre@meta", "thriftlsp@meta", "cppls@meta" }
+local servers = { "rusty@meta", "thriftlsp@meta"
+-- , "cppls@meta" 
+}
 for _, lsp in ipairs(servers) do
   nvim_lsp[lsp].setup {
     on_attach = on_attach,
     flags = {
+      allow_incremental_sync = false,
       -- This will be the default in neovim 0.7+
       debounce_text_changes = 150,
-    }
+    },
+    print_meta_ls_statuses_to_messages = false,
   }
 end
 
@@ -114,14 +124,15 @@ local null_ls = require("null-ls")
 
 null_ls.setup({
   on_attach = function(client, bufnr)
-        if client.resolved_capabilities.document_formatting then
-            vim.cmd([[
-            augroup LspFormatting
-                autocmd! * <buffer>
-                autocmd BufWritePre <buffer> silent noa w | lua vim.lsp.buf.formatting_sync(nil, 30000)
-            augroup END
-            ]])
-        end
+        -- format on save
+        -- if client.resolved_capabilities.document_formatting then
+        --     vim.cmd([[
+        --     augroup LspFormatting
+        --         autocmd! * <buffer>
+        --         autocmd BufWritePre <buffer> silent noa w | lua vim.lsp.buf.formatting_sync(nil, 30000)
+        --     augroup END
+        --     ]])
+        -- end
 
         return on_attach(client, bufnr)
   end,
@@ -130,6 +141,26 @@ null_ls.setup({
     meta.null_ls.formatting.arclint,
   }
 })
+
+vim.lsp.handlers['window/showMessage'] = function(_, result, ctx)
+  local client = vim.lsp.get_client_by_id(ctx.client_id)
+  local lvl = ({
+    'ERROR',
+    'WARN',
+    'INFO',
+    'DEBUG',
+  })[result.type]
+end
+
+vim.lsp.handlers['window/showStatus'] = function(_, result, ctx)
+  local client = vim.lsp.get_client_by_id(ctx.client_id)
+  local lvl = ({
+    'ERROR',
+    'WARN',
+    'INFO',
+    'DEBUG',
+  })[result.type]
+end
 
 
 --completion
@@ -179,6 +210,30 @@ vim.opt.completeopt = { "menu", "menuone", "noselect" }
         },
       })
 
+
+--tree-sitter
+require'nvim-treesitter.configs'.setup {
+  -- A list of parser names, or "all"
+  ensure_installed = { "cpp" },
+
+  -- Install parsers synchronously (only applied to `ensure_installed`)
+  sync_install = false,
+
+  highlight = {
+    enable = true,
+    -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
+    -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
+    -- Using this option may slow down your editor, and you may see some duplicate highlights.
+    -- Instead of true it can also be a list of languages
+    additional_vim_regex_highlighting = false,
+  },
+}
+
+require("trouble").setup {
+  -- your configuration comes here
+  -- or leave it empty to use the default settings
+  -- refer to the configuration section below
+}
 
 EOF
 
@@ -262,6 +317,8 @@ endfunction
 "FZF
 nnoremap <silent> <C-b> :Buffers<CR>
 nnoremap <silent> <C-g>g :Ag<CR>
+"search Ag with word under cursor
+nnoremap <silent> <C-g>* :call fzf#vim#ag(expand('<cword>'))<CR>
 nnoremap <silent> <C-g>c :Commands<CR>
 nnoremap <silent> <C-g>L :Lines<CR>
 nnoremap <silent> <C-g>l :BLines<CR>
@@ -318,5 +375,8 @@ nmap <C-P> :FZF<CR>
 
 "Signify
 "set updatetime=100
+
+"Trouble
+nnoremap <silent> <C-g>t :TroubleToggle<CR>
 
 call SourceIfExists("~/.fbvimrc")
