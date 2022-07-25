@@ -17,10 +17,16 @@ setopt HIST_IGNORE_DUPS
 export EDITOR='nvim'
 export VISUAL='nvim'
 
+export BAT_THEME='Monokai Extended Light'
+
 export PATH=/home/brianc118/.local/bin:$PATH
 export PATH=/home/brianc118/.fzf/bin:$PATH
 
 alias fbcode='cd ~/fbsource/fbcode'
+alias fbsource='cd ~/fbsource'
+alias fbcode2='cd ~/fbsource2/fbcode'
+alias fbsource2='cd ~/fbsource2'
+alias opsfiles='cd ~/opsfiles'
 alias rustfmt='~/fbsource/tools/third-party/rustfmt/rustfmt'
 alias jfds='jf submit --draft --stack -u'
 alias jfd='jf submit --draft -u'
