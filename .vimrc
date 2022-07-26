@@ -20,28 +20,28 @@ Plug 'rust-lang/rust.vim'
 Plug 'mg979/vim-visual-multi', {'branch': 'master'}
 Plug 'vivien/vim-linux-coding-style'
 
-"Meta lsp
-Plug 'neovim/nvim-lspconfig'
-Plug 'nvim-lua/completion-nvim'
-"trouble (lsp errors)
-Plug 'kyazdani42/nvim-web-devicons'
-Plug 'folke/trouble.nvim'
-"magical highlighting
-Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
-Plug 'nvim-lua/plenary.nvim'
-Plug 'nvim-telescope/telescope.nvim'
-Plug 'jose-elias-alvarez/null-ls.nvim'
-Plug '/usr/share/fb-editor-support/nvim'
-"completion
-Plug 'hrsh7th/cmp-nvim-lsp'
-Plug 'hrsh7th/cmp-buffer'
-Plug 'hrsh7th/cmp-path'
-Plug 'hrsh7th/cmp-cmdline'
-Plug 'hrsh7th/nvim-cmp'
-Plug 'L3MON4D3/LuaSnip'
-Plug 'saadparwaiz1/cmp_luasnip'
-
-
+if has('nvim')
+  "Meta lsp
+  Plug 'neovim/nvim-lspconfig'
+  Plug 'nvim-lua/completion-nvim'
+  "trouble (lsp errors)
+  Plug 'kyazdani42/nvim-web-devicons'
+  Plug 'folke/trouble.nvim'
+  "magical highlighting
+  Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+  Plug 'nvim-lua/plenary.nvim'
+  Plug 'nvim-telescope/telescope.nvim'
+  Plug 'jose-elias-alvarez/null-ls.nvim'
+  Plug '/usr/share/fb-editor-support/nvim'
+  "completion
+  Plug 'hrsh7th/cmp-nvim-lsp'
+  Plug 'hrsh7th/cmp-buffer'
+  Plug 'hrsh7th/cmp-path'
+  Plug 'hrsh7th/cmp-cmdline'
+  Plug 'hrsh7th/nvim-cmp'
+  Plug 'L3MON4D3/LuaSnip'
+  Plug 'saadparwaiz1/cmp_luasnip'
+endif
 
 "if has('nvim')
 "  "Deoplete only for nvim
@@ -69,6 +69,8 @@ call plug#end()
 """-------------------------------------------"""
 """                   LUA                     """
 """-------------------------------------------"""
+
+if has('nvim')
 
 lua << EOF
 require("meta.lsp")
@@ -236,6 +238,7 @@ require("trouble").setup {
 }
 
 EOF
+endif
 
 "Handles filetype detection
 if has("autocmd")
