@@ -21,6 +21,7 @@ export BAT_THEME='Monokai Extended Light'
 
 export PATH=/home/brianc118/.local/bin:$PATH
 export PATH=/home/brianc118/.fzf/bin:$PATH
+export PATH="$HOME/homebrew/bin:$HOME/homebrew/sbin:$PATH"
 
 alias fbcode='cd ~/fbsource/fbcode'
 alias fbsource='cd ~/fbsource'
