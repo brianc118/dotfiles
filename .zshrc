@@ -30,6 +30,7 @@ alias opsfiles='cd ~/opsfiles'
 alias rustfmt='~/fbsource/tools/third-party/rustfmt/rustfmt'
 alias jfds='jf submit --draft --stack -u'
 alias jfd='jf submit --draft -u'
+alias et='et -p 8080'
 
 # Proxy
 alias with-proxy='env http_proxy=fwdproxy:8080 https_proxy=fwdproxy:8080 no_proxy=.fbcdn.net,.facebook.com,.thefacebook.com,.tfbnw.net,.fb.com,.fburl.com,.facebook.net,.sb.fbsbx.com,localhost RSYNC_PROXY=fwdproxy:8080 HTTP_PROXY=http://fwdproxy:8080 HTTPS_PROXY=http://fwdproxy:8080'
