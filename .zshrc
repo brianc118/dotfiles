@@ -1,3 +1,5 @@
+source /usr/facebook/ops/rc/master.zshrc
+
 [ -f "$LOCAL_ADMIN_SCRIPTS/master.zshrc" ] && source "$LOCAL_ADMIN_SCRIPTS/master.zshrc"
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
