@@ -14,11 +14,12 @@ Plug 'tpope/vim-dispatch'
 Plug 'justinmk/vim-dirvish'
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
+"Distraction-free writing
+Plug 'junegunn/goyo.vim'
 "Plug 'majutsushi/tagbar'
 Plug 'rust-lang/rust.vim'
 "Plug 'dense-analysis/ale'
 Plug 'mg979/vim-visual-multi', {'branch': 'master'}
-Plug 'vivien/vim-linux-coding-style'
 
 if has('nvim')
   "Meta lsp
@@ -73,6 +74,9 @@ call plug#end()
 if has('nvim')
 
 lua << EOF
+
+require('meta.hg').setup()
+
 require("meta.lsp")
 -- Mappings.
 -- See `:help vim.diagnostic.*` for documentation on any of the below functions
@@ -141,7 +145,8 @@ null_ls.setup({
   sources = {
     meta.null_ls.diagnostics.arclint,
     meta.null_ls.formatting.arclint,
-  }
+  },
+  debug = true
 })
 
 vim.lsp.handlers['window/showMessage'] = function(_, result, ctx)
@@ -272,6 +277,8 @@ set list                  "Show tabs
 set hidden                "Set hidden so we don't get prompted to write when opening new file
 set nolist
 set mouse=
+"true color
+set termguicolors
 
 "We want C-q for tmux prefix"
 noremap <C-q> <Nop>
@@ -298,7 +305,7 @@ map q <Nop>
 """-------------------------------------------"""
 
 "Themes
-let g:vim_monokai_tasty_italic = 1
+let g:vim_monokai_tasty_italic = 0
 colorscheme vim-monokai-tasty
 let g:lightline = {
       \ 'colorscheme': 'monokai_tasty',
