@@ -39,7 +39,11 @@ font:
     x: 0
     y: 0
   # macOS only
-  use_thin_strokes: true
+  #
+  # use thin strokes deprecated. better to set AplleFontSmoothing for org.alacritty with
+  # https://github.com/alacritty/alacritty/issues/4616#issuecomment-1236413444
+  # defaults write org.alacritty AppleFontSmoothing -int 0
+  # use_thin_strokes: true - deprecated
 
 mouse:
   # Click settings
