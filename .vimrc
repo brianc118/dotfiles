@@ -33,7 +33,7 @@ if has('nvim')
   Plug 'nvim-lua/plenary.nvim'
   Plug 'nvim-telescope/telescope.nvim'
   Plug 'jose-elias-alvarez/null-ls.nvim'
-  Plug '/usr/share/fb-editor-support/nvim'
+  Plug '/usr/share/fb-editor-support/nvim', {'as': 'meta.nvim'}
   "completion
   Plug 'hrsh7th/cmp-nvim-lsp'
   Plug 'hrsh7th/cmp-buffer'
@@ -110,9 +110,9 @@ local on_attach = function(client, bufnr)
 end
 
 local nvim_lsp = require("lspconfig")
-local servers = { "rusty@meta", "thriftlsp@meta"
--- , "cppls@meta" 
-}
+local servers = { 
+  -- "cppls@meta", 
+  "rust-analyzer@meta", "thriftlsp@meta" }
 for _, lsp in ipairs(servers) do
   nvim_lsp[lsp].setup {
     on_attach = on_attach,
