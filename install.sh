@@ -4,8 +4,8 @@ set -e
 
 # Repo must be in ~
 DIR=~/dotfiles
-DEFAULT_PKGS_CENTOS="zsh vim neovim tmux git"
-DEFAULT_PKGS_DEBIAN="zsh vim neovim tmux git build-essential"
+DEFAULT_PKGS_CENTOS="zsh vim neovim tmux git the_silver_searcher"
+DEFAULT_PKGS_DEBIAN="zsh vim neovim tmux git silversearcher-ag build-essential"
 DEFAULT_PKGS_DARWIN="zsh vim neovim tmux git tectonic wget"
 # Packages for building mosh
 MOSH_PKGS_CENTOS="autoconf automake protobuf-devel openssl-devel zlib-devel protobuf-compiler protobuf-c-compiler"

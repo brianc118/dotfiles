@@ -326,9 +326,9 @@ endfunction
 
 "FZF
 nnoremap <silent> <C-b> :Buffers<CR>
-nnoremap <silent> <C-g>g :Ag<CR>
-"search Ag with word under cursor
-nnoremap <silent> <C-g>* :call fzf#vim#ag(expand('<cword>'))<CR>
+nnoremap <silent> <C-g>g :Rg<CR>
+"search Rg with word under cursor
+nnoremap <silent> <C-g>r :Rg <C-R><C-W><CR>
 nnoremap <silent> <C-g>c :Commands<CR>
 nnoremap <silent> <C-g>L :Lines<CR>
 nnoremap <silent> <C-g>l :BLines<CR>

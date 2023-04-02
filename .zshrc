@@ -23,6 +23,9 @@ export PATH=/home/brianc118/.local/bin:$PATH
 export PATH=/home/brianc118/.fzf/bin:$PATH
 export PATH="$HOME/homebrew/bin:$HOME/homebrew/sbin:$PATH"
 
+# use ripgrep with fzf
+export FZF_DEFAULT_COMMAND='rg --files --no-ignore-vcs --hidden 2>/dev/null'
+
 alias fbcode='cd ~/fbsource/fbcode'
 alias fbsource='cd ~/fbsource'
 alias fbcode2='cd ~/fbsource2/fbcode'
