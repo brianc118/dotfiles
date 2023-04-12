@@ -7,9 +7,6 @@ DIR=~/dotfiles
 DEFAULT_PKGS_CENTOS="zsh vim neovim tmux git the_silver_searcher"
 DEFAULT_PKGS_DEBIAN="zsh vim neovim tmux git silversearcher-ag build-essential"
 DEFAULT_PKGS_DARWIN="zsh vim neovim tmux git tectonic wget karabiner-elements"
-# Packages for building mosh
-MOSH_PKGS_CENTOS="autoconf automake protobuf-devel openssl-devel zlib-devel protobuf-compiler protobuf-c-compiler"
-MOSH_PKGS_DEBIAN="autoconf automake autoconf libtool g++ protobuf-compiler libprotobuf-dev libboost-dev libutempter-dev libncurses5-dev zlib1g-dev libio-pty-perl libssl-dev make pkg-config"
 MOSH_PKGS_DARWIN="protobuf boost pkg-config automake"
 PKGS_CENTOS="$DEFAULT_PKGS_CENTOS $MOSH_PKGS_CENTOS"
 PKGS_DEBIAN="$DEFAULT_PKGS_DEBIAN $MOSH_PKGS_DEBIAN"
@@ -69,18 +66,6 @@ install() {
        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
   fi
 
-  if ! command -v mosh &> /dev/null; then
-    echo "Building/installing mosh for true color support"
-    rm -rf ~/.mosh
-    git clone https://github.com/brianc118/mosh.git ~/.mosh
-    cd ~/.mosh
-    ./autogen.sh
-    ./configure --disable-dependency-tracking
-    make
-    make install
-    cd ~
-  fi
-
   if [[ ! -d ~/.tmux/plugins/tpm ]]; then
     echo "Installing Tmux Plugin Manager"
     git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
@@ -112,6 +97,7 @@ symlinks () {
   touch ~/.config/nvim/init.vim
   ln -sf $DIR/init.vim ~/.config/nvim/init.vim
   if [[ -d ~/.config/karabiner ]]; then
+    rm -rf ~/.config/karabiner
     ln -sf $DIR/.config/karabiner ~/.config/karabiner
   fi
 }
