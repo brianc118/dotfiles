@@ -6,7 +6,7 @@ set -e
 DIR=~/dotfiles
 DEFAULT_PKGS_CENTOS="zsh vim neovim tmux git the_silver_searcher"
 DEFAULT_PKGS_DEBIAN="zsh vim neovim tmux git silversearcher-ag build-essential"
-DEFAULT_PKGS_DARWIN="zsh vim neovim tmux git tectonic wget"
+DEFAULT_PKGS_DARWIN="zsh vim neovim tmux git tectonic wget karabiner-elements"
 # Packages for building mosh
 MOSH_PKGS_CENTOS="autoconf automake protobuf-devel openssl-devel zlib-devel protobuf-compiler protobuf-c-compiler"
 MOSH_PKGS_DEBIAN="autoconf automake autoconf libtool g++ protobuf-compiler libprotobuf-dev libboost-dev libutempter-dev libncurses5-dev zlib1g-dev libio-pty-perl libssl-dev make pkg-config"
@@ -111,6 +111,9 @@ symlinks () {
   mkdir -p ~/.config/nvim
   touch ~/.config/nvim/init.vim
   ln -sf $DIR/init.vim ~/.config/nvim/init.vim
+  if [[ -d ~/.config/karabiner ]]; then
+    ln -sf $DIR/.config/karabiner ~/.config/karabiner
+  fi
 }
 
 install
