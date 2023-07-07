@@ -25,6 +25,9 @@ if has('nvim')
   "Meta lsp
   Plug 'neovim/nvim-lspconfig'
   Plug 'nvim-lua/completion-nvim'
+  "json lsp
+  Plug 'tamago324/nlsp-settings.nvim'
+
   "trouble (lsp errors)
   Plug 'kyazdani42/nvim-web-devicons'
   Plug 'folke/trouble.nvim'
@@ -275,6 +278,7 @@ set splitright            "Split new vertical splits to the right
 set laststatus=2          "For lightline in 1 buffer
 set list                  "Show tabs
 set hidden                "Set hidden so we don't get prompted to write when opening new file
+set matchpairs+=<:>       "Match other things with %
 set nolist
 set mouse=
 "true color
