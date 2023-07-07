@@ -30,11 +30,15 @@ alias fbcode='cd ~/fbsource/fbcode'
 alias fbsource='cd ~/fbsource'
 alias fbcode2='cd ~/fbsource2/fbcode'
 alias fbsource2='cd ~/fbsource2'
+alias fbcode3='cd ~/fbsource3/fbcode'
+alias fbsource3='cd ~/fbsource3'
 alias opsfiles='cd ~/opsfiles'
 alias rustfmt='~/fbsource/tools/third-party/rustfmt/rustfmt'
 alias jfds='jf submit --draft --stack -u'
 alias jfd='jf submit --draft -u'
 alias et='et -p 8080'
+
+alias suss='sush2 --reason "Tupperware or resource control related debugging"'
 
 # Proxy
 alias with-proxy='env http_proxy=fwdproxy:8080 https_proxy=fwdproxy:8080 no_proxy=.fbcdn.net,.facebook.com,.thefacebook.com,.tfbnw.net,.fb.com,.fburl.com,.facebook.net,.sb.fbsbx.com,localhost RSYNC_PROXY=fwdproxy:8080 HTTP_PROXY=http://fwdproxy:8080 HTTPS_PROXY=http://fwdproxy:8080'
