@@ -1,0 +1,30 @@
+{
+  "title": "Map command+<_> to ctrl+<_> operations for ergonomics",
+  "rules": [
+	{
+	  "description": "command-d to ctrl-q for tmux window toggle",
+	  "manipulators": [
+        {
+    "type": "basic",
+    "from": {
+        "key_code": "d",
+        "modifiers": {
+            "mandatory": ["left_command"],
+            "optional": [
+                "any"
+            ]
+        }
+    },
+    "to": [
+        {
+            "key_code": "q",
+            "modifiers": ["control"],
+            "lazy": true
+        }
+    ]
+}
+	  ]
+	}
+  ]
+}
+
