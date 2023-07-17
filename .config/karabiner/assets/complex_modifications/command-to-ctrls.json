@@ -179,6 +179,43 @@
       ]
     },
     {
+      "description": "command-shift-f to command-f in terminal to maximize window",
+      "manipulators": [
+        {
+          "type": "basic",
+          "conditions": [
+            {
+              "type": "frontmost_application_if",
+              "bundle_identifiers": [
+                "^org\\.alacritty$"
+              ]
+            }
+          ],
+          "from": {
+            "key_code": "f",
+            "modifiers": {
+              "mandatory": [
+                "left_command",
+                "shift"
+              ],
+              "optional": [
+                "any"
+              ]
+            }
+          },
+          "to": [
+            {
+              "key_code": "f",
+              "modifiers": [
+                "left_command"
+              ],
+              "lazy": true
+            }
+          ]
+        }
+      ]
+    },
+    {
       "description": "command-w to ctrl-w in terminal",
       "manipulators": [
         {
