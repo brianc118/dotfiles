@@ -69,6 +69,7 @@ cursor:
   unfocused_hollow: true
 
 key_bindings:
+  - { key: L,         mods: Command, chars: "^l" }
   - { key: F,    mods: Command, action: ToggleSimpleFullscreen   }
   - { key: Q,    mods: Control, chars: "\x11" }
     # # Alt as meta bindings
