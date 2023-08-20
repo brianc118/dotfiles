@@ -123,8 +123,11 @@ end
 
 local nvim_lsp = require("lspconfig")
 local servers = { 
-  -- "cppls@meta", 
-  "rust-analyzer@meta", "thriftlsp@meta" }
+  "buckls@meta", 
+  "cppls@meta", 
+  "rust-analyzer@meta", 
+  "thriftlsp@meta"
+}
 for _, lsp in ipairs(servers) do
   nvim_lsp[lsp].setup {
     on_attach = on_attach,
@@ -292,6 +295,9 @@ set nolist
 set mouse=
 "true color
 set termguicolors
+"Disable sign column (for git and lsp warning/errors) as it's disruptive when
+"it shifts
+set signcolumn=no
 
 "We want C-q for tmux prefix"
 noremap <C-q> <Nop>
