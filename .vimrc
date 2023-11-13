@@ -22,8 +22,6 @@ Plug 'rust-lang/rust.vim'
 Plug 'mg979/vim-visual-multi', {'branch': 'master'}
 
 if has('nvim')
-  "Meta lsp
-  Plug 'neovim/nvim-lspconfig'
   Plug 'nvim-lua/completion-nvim'
   "json lsp
   Plug 'tamago324/nlsp-settings.nvim'
@@ -36,7 +34,6 @@ if has('nvim')
   Plug 'nvim-lua/plenary.nvim'
   Plug 'nvim-telescope/telescope.nvim'
   Plug 'jose-elias-alvarez/null-ls.nvim'
-  Plug '/usr/share/fb-editor-support/nvim', {'as': 'meta.nvim'}
   "completion
   Plug 'hrsh7th/cmp-nvim-lsp'
   Plug 'hrsh7th/cmp-buffer'
@@ -45,6 +42,11 @@ if has('nvim')
   Plug 'hrsh7th/nvim-cmp'
   Plug 'L3MON4D3/LuaSnip'
   Plug 'saadparwaiz1/cmp_luasnip'
+  "Meta lsp
+  if hostname() =~ '.*facebook.*'
+    Plug 'neovim/nvim-lspconfig'
+    Plug '/usr/share/fb-editor-support/nvim', {'as': 'meta.nvim'}
+  endif
 endif
 
 "if has('nvim')
@@ -78,9 +80,12 @@ if has('nvim')
 
 lua << EOF
 
-require('meta.hg').setup()
+local is_fb = string.match(vim.fn.hostname(), ".*facebook.*")
 
-require("meta.lsp")
+if is_fb then
+  require('meta.hg').setup()
+  require("meta.lsp")
+end
 
 -- Global mappings taken from
 -- https://github.com/neovim/nvim-lspconfig/blob/4deb72306a59b1a36e571f9d86d6c5a05b20b294/README.md
@@ -122,12 +127,17 @@ end
 
 
 local nvim_lsp = require("lspconfig")
-local servers = { 
-  "buckls@meta", 
-  "cppls@meta", 
-  "rust-analyzer@meta", 
-  "thriftlsp@meta"
-}
+local servers = {}
+if is_fb then
+  servers = { 
+    "buckls@meta", 
+    "cppls@meta", 
+    "rust-analyzer@meta", 
+    "thriftlsp@meta"
+  }
+else
+  servers = {}
+end
 for _, lsp in ipairs(servers) do
   nvim_lsp[lsp].setup {
     on_attach = on_attach,
@@ -140,8 +150,15 @@ for _, lsp in ipairs(servers) do
   }
 end
 
-local meta = require("meta")
 local null_ls = require("null-ls")
+local null_ls_sources = {}
+if is_fb then
+  local meta = require("meta")
+  null_ls_sources = {
+    meta.null_ls.diagnostics.arclint,
+    meta.null_ls.formatting.arclint,
+  }
+end
 
 null_ls.setup({
   on_attach = function(client, bufnr)
@@ -157,10 +174,7 @@ null_ls.setup({
 
         return on_attach(client, bufnr)
   end,
-  sources = {
-    meta.null_ls.diagnostics.arclint,
-    meta.null_ls.formatting.arclint,
-  },
+  sources = null_ls_sources,
   debug = true
 })
 
@@ -256,6 +270,20 @@ require("trouble").setup {
   -- or leave it empty to use the default settings
   -- refer to the configuration section below
 }
+
+if is_fb then
+  require("meta.metamate").init({
+          -- // change the keymap used for accepting completion. defaults to <C-l>
+          -- completionKeymap='<C-m>', 
+          
+          -- // change the highlight group used for showing the completion. defaults to Delimiter
+          virtualTextHighlightGroup='DiagnosticHint',
+          
+          -- // change the languages to target. defaults to php, python, rust
+          filetypes = {"cpp", "rust", "python"} 
+  })
+end
+
 
 EOF
 endif
