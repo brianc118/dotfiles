@@ -42,9 +42,9 @@ if has('nvim')
   Plug 'hrsh7th/nvim-cmp'
   Plug 'L3MON4D3/LuaSnip'
   Plug 'saadparwaiz1/cmp_luasnip'
+  Plug 'neovim/nvim-lspconfig'
   "Meta lsp
   if hostname() =~ '.*facebook.*'
-    Plug 'neovim/nvim-lspconfig'
     Plug '/usr/share/fb-editor-support/nvim', {'as': 'meta.nvim'}
   endif
 endif
@@ -136,7 +136,11 @@ if is_fb then
     "thriftlsp@meta"
   }
 else
-  servers = {}
+  servers = {
+    "clangd",
+    "pyright",
+    "rust_analyzer",
+  }
 end
 for _, lsp in ipairs(servers) do
   nvim_lsp[lsp].setup {
@@ -250,7 +254,7 @@ vim.opt.completeopt = { "menu", "menuone", "noselect" }
 --tree-sitter
 require'nvim-treesitter.configs'.setup {
   -- A list of parser names, or "all"
-  ensure_installed = { "cpp" },
+  ensure_installed = { "cpp", "rust", "python" },
 
   -- Install parsers synchronously (only applied to `ensure_installed`)
   sync_install = false,
