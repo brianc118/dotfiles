@@ -340,6 +340,7 @@ nnoremap <C-w>> 10<C-w>>
 
 map <C-a> <ESC>^
 imap <C-a> <ESC>I
+cmap <C-a> <C-b>
 map <C-e> <ESC>$
 imap <C-e> <ESC>A
 inoremap <M-f> <ESC><Space>Wi
