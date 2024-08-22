@@ -79,6 +79,23 @@ call plug#end()
 if has('nvim')
 
 lua << EOF
+-- osc52 clipboar
+--vim.g.clipboard = {
+--  name = 'osc52',
+--  copy = {['+'] = copy, ['*'] = copy},
+--  paste = {['+'] = 'tmux save-buffer -', ['*'] = 'tmux save-buffer -'}
+--}
+    vim.g.clipboard = {
+      name = 'OSC 52',
+      copy = {
+        ['+'] = require('vim.ui.clipboard.osc52').copy('+'),
+        ['*'] = require('vim.ui.clipboard.osc52').copy('*'),
+      },
+      paste = {
+        ['+'] = require('vim.ui.clipboard.osc52').paste('+'),
+        ['*'] = require('vim.ui.clipboard.osc52').paste('*'),
+      },
+    }
 
 local is_fb = string.match(vim.fn.hostname(), ".*facebook.*")
 
@@ -133,7 +150,9 @@ if is_fb then
     "buckls@meta", 
     "cppls@meta", 
     "rust-analyzer@meta", 
-    "thriftlsp@meta"
+    "thriftlsp@meta",
+    "pyls@meta",
+    "pyre@meta",
   }
 else
   servers = {
@@ -254,7 +273,7 @@ vim.opt.completeopt = { "menu", "menuone", "noselect" }
 --tree-sitter
 require'nvim-treesitter.configs'.setup {
   -- A list of parser names, or "all"
-  ensure_installed = { "cpp", "rust", "python" },
+  ensure_installed = { "c", "lua", "vim", "vimdoc", "query", "cpp", "rust", "python" },
 
   -- Install parsers synchronously (only applied to `ensure_installed`)
   sync_install = false,
