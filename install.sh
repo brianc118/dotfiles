@@ -92,7 +92,7 @@ symlinks () {
   ln -sf $DIR/.zpreztorc ~
   ln -sf $DIR/.vimrc ~
   ln -sf $DIR/.tmux.conf ~
-  ln -sf $DIR/.alacritty.yml ~
+  ln -sf $DIR/.alacritty.toml ~
   mkdir -p ~/.config/nvim
   touch ~/.config/nvim/init.vim
   ln -sf $DIR/init.vim ~/.config/nvim/init.vim
