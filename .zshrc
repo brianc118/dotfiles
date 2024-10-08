@@ -1,3 +1,4 @@
+[ -f "/apollo/env/envImprovement/var/zshrc" ] && source "/apollo/env/envImprovement/var/zshrc"
 [ -f "$LOCAL_ADMIN_SCRIPTS/master.zshrc" ] && source "$LOCAL_ADMIN_SCRIPTS/master.zshrc"
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
@@ -47,3 +48,8 @@ alias proxycurl='curl -x fwdproxy:8080'
 # Bash completion: D33783636
 # export BUCK_COMPLETION_GUESS_TARGETS=1
 source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
+
+# if you wish to use IMDS set AWS_EC2_METADATA_DISABLED=false
+
+export AWS_EC2_METADATA_DISABLED=true
+
