@@ -1,3 +1,4 @@
+[ -f "/apollo/env/DevDesktopAL2/misc/zshrc_dev_dsk_base" ] && source "/apollo/env/DevDesktopAL2/misc/zshrc_dev_dsk_base"
 [ -f "/apollo/env/envImprovement/var/zshrc" ] && source "/apollo/env/envImprovement/var/zshrc"
 [ -f "$LOCAL_ADMIN_SCRIPTS/master.zshrc" ] && source "$LOCAL_ADMIN_SCRIPTS/master.zshrc"
 
@@ -23,6 +24,7 @@ export BAT_THEME='Monokai Extended Light'
 export PATH=/home/brianc118/.local/bin:$PATH
 export PATH=/home/brianc118/.fzf/bin:$PATH
 export PATH="$HOME/homebrew/bin:$HOME/homebrew/sbin:$PATH"
+[ -d /apollo/env/OdinTools/bin ] && export PATH=/apollo/env/OdinTools/bin:$PATH
 
 # use ripgrep with fzf
 export FZF_DEFAULT_COMMAND='rg --files --no-ignore-vcs --hidden 2>/dev/null'
@@ -37,7 +39,9 @@ alias opsfiles='cd ~/opsfiles'
 alias rustfmt='~/fbsource/tools/third-party/rustfmt/rustfmt'
 alias jfds='jf submit --draft --stack -u'
 alias jfd='jf submit --draft -u'
-alias et='et -p 8080'
+alias et='et -p 2022'
+alias wp='cd ~/workplace'
+alias pasta='paste.amazon.com'
 
 alias suss='sush2 --reason "Tupperware or resource control related debugging"'
 
@@ -53,3 +57,5 @@ source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
 
 export AWS_EC2_METADATA_DISABLED=true
 
+PATH=$PATH:/apollo/env/NRE-Desktop/bin
+export PATH
