@@ -98,6 +98,7 @@ lua << EOF
     }
 
 local is_fb = string.match(vim.fn.hostname(), ".*facebook.*")
+local is_amazon = string.match(vim.fn.hostname(), ".*amazon.*")
 
 if is_fb then
   require('meta.hg').setup()
@@ -115,6 +116,25 @@ vim.keymap.set('n', '<space>e', vim.diagnostic.open_float, opts)
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)
 vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist, opts)
+
+function bemol()
+ local bemol_dir = vim.fs.find({ '.bemol' }, { upward = true, type = 'directory'})[1]
+ local ws_folders_lsp = {}
+ if bemol_dir then
+  local file = io.open(bemol_dir .. '/ws_root_folders', 'r')
+  if file then
+
+   for line in file:lines() do
+    table.insert(ws_folders_lsp, line)
+   end
+   file:close()
+  end
+ end
+
+ for _, line in ipairs(ws_folders_lsp) do
+  vim.lsp.buf.add_workspace_folder(line)
+ end
+end
 
 -- Use an on_attach function to only map the following keys
 -- after the language server attaches to the current buffer
@@ -140,6 +160,10 @@ local on_attach = function(client, bufnr)
   vim.keymap.set('n', '<space>ca', vim.lsp.buf.code_action, bufopts)
   vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
   vim.keymap.set('n', '<space>f', function() vim.lsp.buf.format { async = true } end, bufopts)
+
+  if is_amazon then
+    bemol()
+  end
 end
 
 
@@ -154,6 +178,11 @@ if is_fb then
     "pyls@meta",
     "pyre@meta",
   }
+elseif is_amazon then
+  -- TODO: Barium for config
+  servers = {
+    "pyright"
+  }
 else
   servers = {
     "clangd",
@@ -161,6 +190,7 @@ else
     "rust_analyzer",
   }
 end
+
 for _, lsp in ipairs(servers) do
   nvim_lsp[lsp].setup {
     on_attach = on_attach,
