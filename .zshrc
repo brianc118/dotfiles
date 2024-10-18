@@ -21,9 +21,10 @@ export VISUAL='nvim'
 
 export BAT_THEME='Monokai Extended Light'
 
-export PATH=/home/brianc118/.local/bin:$PATH
-export PATH=/home/brianc118/.fzf/bin:$PATH
+export PATH="/home/$USER/.local/bin:$PATH"
+export PATH="/home/$USER/.fzf/bin:$PATH"
 export PATH="$HOME/homebrew/bin:$HOME/homebrew/sbin:$PATH"
+[ -d /apollo/env/OdinTools/bin ] && export PATH=/apollo/env/OdinTools/bin:$PATH
 [ -d /apollo/env/OdinTools/bin ] && export PATH=/apollo/env/OdinTools/bin:$PATH
 
 # use ripgrep with fzf

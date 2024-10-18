@@ -98,6 +98,7 @@ symlinks () {
   ln -sf $DIR/.vimrc ~
   ln -sf $DIR/.tmux.conf ~
   ln -sf $DIR/.alacritty.toml ~
+
   mkdir -p ~/.config/nvim
   touch ~/.config/nvim/init.vim
   ln -sf $DIR/init.vim ~/.config/nvim/init.vim
@@ -105,6 +106,9 @@ symlinks () {
     rm -rf ~/.config/karabiner
     ln -sf $DIR/.config/karabiner ~/.config/karabiner
   fi
+
+  mkdir -p ~/.local/bin
+  ln -sf $DIR/brazil_test_env_wrap.sh ~/.local/bin
 }
 
 install

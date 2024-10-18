@@ -211,6 +211,27 @@ if is_fb then
     meta.null_ls.diagnostics.arclint,
     meta.null_ls.formatting.arclint,
   }
+elseif is_amazon then
+  null_ls_sources = {
+    null_ls.builtins.formatting.black.with({
+      env = {
+        -- Please ensure env variable BRAZIL_TEST_ENV_WRAP_PKG_DIR
+        -- exists
+        BRAZIL_PACKAGE_DIR=vim.env.BRAZIL_TEST_ENV_WRAP_PKG_DIR,
+        INNER_CMD = "black"
+      },
+      command = "brazil_test_env_wrap.sh",
+    }),
+    null_ls.builtins.formatting.isort.with({
+      env = {
+        -- Please ensure env variable BRAZIL_TEST_ENV_WRAP_PKG_DIR
+        -- exists
+        BRAZIL_PACKAGE_DIR=vim.env.BRAZIL_TEST_ENV_WRAP_PKG_DIR,
+        INNER_CMD = "isort"
+      },
+      command = "brazil_test_env_wrap.sh",
+    }),
+  }
 end
 
 null_ls.setup({
