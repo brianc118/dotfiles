@@ -11,6 +11,7 @@ call plug#begin('~/.vim/plugged')
 "Plug 'preservim/nerdtree'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'tpope/vim-dispatch'
+Plug 'tpope/vim-surround'
 Plug 'justinmk/vim-dirvish'
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
@@ -32,6 +33,7 @@ if has('nvim')
   Plug 'folke/trouble.nvim'
   "magical highlighting
   Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+  Plug 'nvim-treesitter/nvim-treesitter-context'
   Plug 'nvim-lua/plenary.nvim'
   Plug 'nvim-telescope/telescope.nvim'
   Plug 'jose-elias-alvarez/null-ls.nvim'
@@ -118,6 +120,12 @@ local opts = { noremap=true, silent=true }
 vim.keymap.set('n', '<space>e', vim.diagnostic.open_float, opts)
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)
+vim.keymap.set('n', '[e', function()
+    vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.ERROR })
+end, opts)
+vim.keymap.set('n', ']e', function()
+    vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR })
+end, opts)
 vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist, opts)
 
 function bemol()
@@ -345,6 +353,21 @@ require'nvim-treesitter.configs'.setup {
   },
 }
 
+require'treesitter-context'.setup{
+  enable = true, -- Enable this plugin (Can be enabled/disabled later via commands)
+  max_lines = 1, -- How many lines the window should span. Values <= 0 mean no limit.
+  min_window_height = 0, -- Minimum editor window height to enable context. Values <= 0 mean no limit.
+  line_numbers = true,
+  multiline_threshold = 20, -- Maximum number of lines to show for a single context
+  trim_scope = 'outer', -- Which context lines to discard if `max_lines` is exceeded. Choices: 'inner', 'outer'
+  mode = 'cursor',  -- Line used to calculate context. Choices: 'cursor', 'topline'
+  -- Separator between context and content. Should be a single character string, like '-'.
+  -- When separator is set, the context will only show up when there are at least 2 lines above cursorline.
+  separator = nil,
+  zindex = 20, -- The Z-index of the context window
+  on_attach = nil, -- (fun(buf: integer): boolean) return false to disable attaching
+}
+
 require("trouble").setup {
   -- your configuration comes here
   -- or leave it empty to use the default settings
@@ -450,9 +473,9 @@ set nolist
 set mouse=
 "true color
 set termguicolors
-"Disable sign column (for git and lsp warning/errors) as it's disruptive when
-"it shifts
-set signcolumn=yes:1
+if has('nvim')
+  set signcolumn=yes:1
+endif
 
 "We want C-q for tmux prefix"
 noremap <C-q> <Nop>
@@ -472,7 +495,6 @@ inoremap <M-d> <ESC>cW
 
 
 "Turn off vim recording
-map q <Nop>
 
 
 """-------------------------------------------"""
