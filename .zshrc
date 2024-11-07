@@ -44,6 +44,16 @@ alias et='et -p 2022'
 alias wp='cd ~/workplace'
 alias pasta='paste.amazon.com --keep 300days'
 
+alias bbf="brazil-build format"
+alias bbr="brazil-build release"
+alias bbt="brazil-build test"
+alias bre=brazil-runtime-exec
+alias brp="brazil-runtime-exec python"
+alias bte=brazil-test-exec
+alias btp="brazil-test-exec pytest -k"
+
+alias g="git"
+
 alias suss='sush2 --reason "Tupperware or resource control related debugging"'
 
 # Proxy
@@ -52,7 +62,6 @@ alias proxycurl='curl -x fwdproxy:8080'
 
 # Bash completion: D33783636
 # export BUCK_COMPLETION_GUESS_TARGETS=1
-source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
 
 # if you wish to use IMDS set AWS_EC2_METADATA_DISABLED=false
 
@@ -64,3 +73,5 @@ export PATH
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
