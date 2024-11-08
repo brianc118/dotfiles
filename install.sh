@@ -109,6 +109,7 @@ symlinks () {
 
   mkdir -p ~/.local/bin
   ln -sf $DIR/brazil_test_env_wrap.sh ~/.local/bin
+  ln -sf $DIR/rebase.sh ~/.local/bin
 }
 
 install
