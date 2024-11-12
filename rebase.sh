@@ -35,6 +35,7 @@ resolve_ref() {
 }
 
 # Resolve and validate commits
+current_sha=$(resolve_ref "HEAD")
 source_sha=$(resolve_ref "$source_commit")
 destination_sha=$(resolve_ref "$destination_commit")
 
@@ -63,3 +64,6 @@ for branch in "${leaf_branches[@]}"; do
         git rebase --abort
     fi
 done
+
+# Return to the original position
+git checkout $current_sha
