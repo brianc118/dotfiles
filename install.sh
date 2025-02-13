@@ -93,6 +93,7 @@ post_install () {
 symlinks () {
   echo "Symlinks"
   cd $DIR
+  ln -sf $DIR/.gitconfig ~
   ln -sf $DIR/.zshrc ~
   ln -sf $DIR/.zpreztorc ~
   ln -sf $DIR/.vimrc ~
