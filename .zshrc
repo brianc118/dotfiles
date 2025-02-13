@@ -26,6 +26,7 @@ export PATH="/home/$USER/.fzf/bin:$PATH"
 export PATH="$HOME/homebrew/bin:$HOME/homebrew/sbin:$PATH"
 [ -d /apollo/env/OdinTools/bin ] && export PATH=/apollo/env/OdinTools/bin:$PATH
 [ -d /apollo/env/OdinTools/bin ] && export PATH=/apollo/env/OdinTools/bin:$PATH
+[ -d "$HOME/.toolbox/bin" ] && export PATH="$HOME/.toolbox/bin:$PATH"
 
 # use ripgrep with fzf
 export FZF_DEFAULT_COMMAND='rg --files --no-ignore-vcs --hidden 2>/dev/null'
