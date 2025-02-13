@@ -42,7 +42,6 @@ alias jfds='jf submit --draft --stack -u'
 alias jfd='jf submit --draft -u'
 alias et='et -p 2022'
 alias wp='cd ~/workplace'
-alias pasta='paste.amazon.com --keep 300days'
 
 alias bbf="brazil-build format"
 alias bbr="brazil-build release"
