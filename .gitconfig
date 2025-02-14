@@ -9,3 +9,13 @@
 	default = simple
 [alias]
 	dag = log --graph --format='format:%C(yellow)%h%C(reset) %C(blue)\"%an\" <%ae>%C(reset) %C(magenta)%cr%C(reset)%C(auto)%d%C(reset)%n%s' --date-order
+  amend = commit -a --amend --no-edit
+        sl =  log -n 10 --graph --abbrev-commit --abbrev=8 --decorate --format=format:'%C(yellow)%h%C(reset)  %C(white)%ar%C(reset)  %an  %C(auto)%D%C(reset)%n%C(white)%<(70,trunc)%s%C(reset)%n'
+	lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+
+
+[rebase]
+      updateRefs = true
+
+[log]
+      graphColors = "#ffffff",red,green
