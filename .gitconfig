@@ -9,7 +9,7 @@
 	default = simple
 [alias]
 	dag = log --graph --format='format:%C(yellow)%h%C(reset) %C(blue)\"%an\" <%ae>%C(reset) %C(magenta)%cr%C(reset)%C(auto)%d%C(reset)%n%s' --date-order
-  amend = commit -a --amend --no-edit
+        amend = commit -a --amend --no-edit --date="now" --reset-author
         sl =  log -n 10 --graph --all --abbrev-commit --abbrev=8 --decorate --format=format:'%C(yellow)%h%C(reset)  %C(white)%ar%C(reset)  %an  %C(auto)%D%C(reset)%n%C(white)%<(70,trunc)%s%C(reset)%n'
 	lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
   clean-branches = "!f() { git fetch origin && git branch --merged origin/mainline | grep -v \"^\\*\" | grep -v \"mainline\" | xargs -r git branch -d; }; f"
