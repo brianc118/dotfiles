@@ -15,9 +15,18 @@
   clean-branches = "!f() { git fetch origin && git branch --merged origin/mainline | grep -v \"^\\*\" | grep -v \"mainline\" | xargs -r git branch -d; }; f"
 
 
+    # Difftastic aliases, so `git dlog` is `git log` with difftastic and so on.
+    dlog = -c diff.external=difft log --ext-diff
+    dshow = -c diff.external=difft show --ext-diff
+    ddiff = -c diff.external=difft diff
 
 [rebase]
       updateRefs = true
 
 [log]
       graphColors = "#ffffff",red,green
+[filter "lfs"]
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
