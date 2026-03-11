@@ -29,7 +29,7 @@ if has('nvim')
   Plug 'tamago324/nlsp-settings.nvim'
 
   "trouble (lsp errors)
-  Plug 'kyazdani42/nvim-web-devicons'
+  Plug 'nvim-tree/nvim-web-devicons'
   Plug 'folke/trouble.nvim'
   "magical highlighting
   Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
@@ -74,6 +74,14 @@ Plug 'patstockwell/vim-monokai-tasty'
 Plug 'elzr/vim-json'
 "monokai with tree-sitter
 Plug 'tanvirtin/monokai.nvim'
+
+"AI
+Plug 'stevearc/dressing.nvim'
+Plug 'nvim-lua/plenary.nvim'
+Plug 'MunifTanjim/nui.nvim'
+Plug 'MeanderingProgrammer/render-markdown.nvim'
+Plug 'yetone/avante.nvim', { 'branch': 'main', 'do': 'make' }
+Plug 'nvim-tree/nvim-web-devicons'
 
 call plug#end()
 
@@ -192,7 +200,8 @@ if is_fb then
 elseif is_amazon then
   -- TODO: Barium for config
   servers = {
-    "pyright"
+    "pyright",
+    "ts_ls",
   }
 else
   servers = {
@@ -431,6 +440,15 @@ else
       -- Text object
       map({'o', 'x'}, 'ih', ':<C-U>Gitsigns select_hunk<CR>')
     end
+  }
+
+  require('avante').setup {
+    provider = "bedrock",
+    bedrock = {
+      model = "us.anthropic.claude-3-7-sonnet-20250219-v1:0",
+      aws_profile = "cline-profile",
+      aws_region = "us-west-2",
+    }
   }
 end
 
