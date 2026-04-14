@@ -1,5 +1,7 @@
 [ -f "/apollo/env/DevDesktopAL2/misc/zshrc_dev_dsk_base" ] && source "/apollo/env/DevDesktopAL2/misc/zshrc_dev_dsk_base"
+[ -f "/apollo/env/DevDesktopAL2023/misc/zshrc_dev_dsk_base" ] && source "/apollo/env/DevDesktopAL2023/misc/zshrc_dev_dsk_base"
 [ -f "/apollo/env/envImprovement/var/zshrc" ] && source "/apollo/env/envImprovement/var/zshrc"
+[ -f "/apollo/env/EnvImprovement/var/zshrc" ] && source "/apollo/env/EnvImprovement/var/zshrc"
 [ -f "$LOCAL_ADMIN_SCRIPTS/master.zshrc" ] && source "$LOCAL_ADMIN_SCRIPTS/master.zshrc"
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
