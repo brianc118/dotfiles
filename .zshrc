@@ -77,3 +77,7 @@ export NVM_DIR="$HOME/.nvm"
 source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
 
 [ -s "/home/linuxbrew/.linuxbrew/bin/brew" ] && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
+. "$HOME/.cargo/env"
+
+alias bl=/home/bpc/workplace/rollcage_ops_tools/src/RollcageOpsTools/src/rollcage_ops_tools/bpc/build_logs.sh

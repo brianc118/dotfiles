@@ -7,9 +7,11 @@ DEFAULT_PKGS_CENTOS="zsh vim neovim tmux git the_silver_searcher"
 DEFAULT_PKGS_DEBIAN="zsh vim neovim tmux git silversearcher-ag build-essential"
 DEFAULT_PKGS_DARWIN="zsh vim neovim tmux git tectonic wget karabiner-elements"
 DEFAULT_PKGS_AL2="zsh vim tmux git"
+DEFAULT_PKGS_AL2023="zsh vim tmux git below"
 MOSH_PKGS_DARWIN="protobuf boost pkg-config automake"
 PKGS_CENTOS="$DEFAULT_PKGS_CENTOS $MOSH_PKGS_CENTOS"
 PKGS_AL2="$DEFAULT_PKGS_AL2"
+PKGS_AL2023="$DEFAULT_PKGS_AL2023"
 PKGS_DEBIAN="$DEFAULT_PKGS_DEBIAN $MOSH_PKGS_DEBIAN"
 PKGS_DARWIN="$DEFAULT_PKGS_DARWIN $MOSH_PKGS_DARWIN"
 
@@ -18,7 +20,15 @@ install() {
   # Figure out which package manager to use
   platform=$(uname)
   if [[ $platform == 'Linux' ]]; then
-    if [[ -f /etc/redhat-release ]]; then
+    if [[ -f /etc/os-release && $(source /etc/os-release && echo $NAME) == "Amazon Linux" && $(source /etc/os-release && echo $VERSION) == "2023" ]]; then
+      echo "Detected AL2023"
+      PKG_MANAGER_CMD="sudo dnf install -y"
+      PKGS="$PKGS_AL2023"
+    elif [[ -f /etc/os-release && $(source /etc/os-release && echo $NAME) == "Amazon Linux" && $(source /etc/os-release && echo $VERSION) == "2" ]]; then
+      echo "Detected AL2 brianc118"
+      PKG_MANAGER_CMD="sudo yum install -y"
+      PKGS="$PKGS_AL2"
+    elif [[ -f /etc/redhat-release ]]; then
       PKG_MANAGER_CMD="sudo dnf install -y"
       PKGS="$PKGS_CENTOS"
     elif [[ -f /etc/debian_version ]]; then
@@ -27,10 +37,6 @@ install() {
     elif [[ -f /etc/arch-release ]]; then
       PKG_MANAGER_CMD="sudo pacman -S"
       PKGS="$PKGS_CENTOS"
-    elif [[ -f /etc/os-release && $(source /etc/os-release && echo $NAME) == "Amazon Linux" && $(source /etc/os-release && echo $VERSION) == "2" ]]; then
-      echo "Detected AL2 brianc118"
-      PKG_MANAGER_CMD="sudo yum install -y"
-      PKGS="$PKGS_AL2"
     else
       echo "Unhandled Linux distro -- giving up forever"
       exit 1
