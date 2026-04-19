@@ -32,7 +32,7 @@ if has('nvim')
   Plug 'nvim-tree/nvim-web-devicons'
   Plug 'folke/trouble.nvim'
   "magical highlighting
-  Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+  Plug 'nvim-treesitter/nvim-treesitter', {'branch': 'master', 'do': ':TSUpdate'}
   Plug 'nvim-treesitter/nvim-treesitter-context'
   Plug 'nvim-lua/plenary.nvim'
   Plug 'nvim-telescope/telescope.nvim'
@@ -76,11 +76,7 @@ Plug 'elzr/vim-json'
 Plug 'tanvirtin/monokai.nvim'
 
 "AI
-Plug 'stevearc/dressing.nvim'
 Plug 'nvim-lua/plenary.nvim'
-Plug 'MunifTanjim/nui.nvim'
-Plug 'MeanderingProgrammer/render-markdown.nvim'
-Plug 'yetone/avante.nvim', { 'branch': 'main', 'do': 'make' }
 Plug 'nvim-tree/nvim-web-devicons'
 
 call plug#end()
@@ -92,6 +88,8 @@ call plug#end()
 if has('nvim')
 
 lua << EOF
+-- silence deprecation warnings from unmaintained plugins (null-ls, plenary)
+vim.deprecate = function() end
 -- osc52 clipboar
 --vim.g.clipboard = {
 --  name = 'osc52',
@@ -211,17 +209,15 @@ else
   }
 end
 
-for _, lsp in ipairs(servers) do
-  nvim_lsp[lsp].setup {
-    on_attach = on_attach,
-    flags = {
-      allow_incremental_sync = false,
-      -- This will be the default in neovim 0.7+
-      debounce_text_changes = 150,
-    },
-    print_meta_ls_statuses_to_messages = false,
-  }
-end
+vim.lsp.config('*', {
+  on_attach = on_attach,
+  flags = {
+    allow_incremental_sync = false,
+    debounce_text_changes = 150,
+  },
+  print_meta_ls_statuses_to_messages = false,
+})
+vim.lsp.enable(servers)
 
 local null_ls = require("null-ls")
 local null_ls_sources = {}
@@ -440,15 +436,6 @@ else
       -- Text object
       map({'o', 'x'}, 'ih', ':<C-U>Gitsigns select_hunk<CR>')
     end
-  }
-
-  require('avante').setup {
-    provider = "bedrock",
-    bedrock = {
-      model = "us.anthropic.claude-3-7-sonnet-20250219-v1:0",
-      aws_profile = "cline-profile",
-      aws_region = "us-west-2",
-    }
   }
 end
 
