@@ -76,6 +76,14 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
+# Activate mise so node (installed via RtxNode AL2-compatible build) is on PATH.
+# Pyright-python's nodeenv bundles an official Node binary that requires
+# GLIBC 2.27/2.28, which AL2 lacks. Putting mise's node on PATH makes
+# pyright-python use it instead of the broken bundled one.
+if command -v mise >/dev/null 2>&1; then
+    eval "$(mise activate zsh)"
+fi
+
 source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
 
 [ -s "/home/linuxbrew/.linuxbrew/bin/brew" ] && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
@@ -83,3 +91,8 @@ source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
 . "$HOME/.cargo/env"
 
 alias bl=/home/bpc/workplace/rollcage_ops_tools/src/RollcageOpsTools/src/rollcage_ops_tools/bpc/build_logs.sh
+
+export PATH="/home/bpc/workplace/Terris/src/Terris/Scripts:$PATH"
+
+# Added by AIM CLI
+export PATH="/local/home/bpc/.aim/mcp-servers:$PATH"

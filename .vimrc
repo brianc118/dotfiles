@@ -200,6 +200,7 @@ elseif is_amazon then
   servers = {
     "pyright",
     "ts_ls",
+    "rust_analyzer",
   }
 else
   servers = {
@@ -217,6 +218,11 @@ vim.lsp.config('*', {
   },
   print_meta_ls_statuses_to_messages = false,
 })
+if is_amazon then
+  vim.lsp.config('rust_analyzer', {
+    cmd = { vim.fn.expand("~/.toolbox/bin/rust-analyzer") },
+  })
+end
 vim.lsp.enable(servers)
 
 local null_ls = require("null-ls")
