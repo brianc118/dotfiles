@@ -1,16 +1,10 @@
-[ -f "/apollo/env/DevDesktopAL2/misc/zshrc_dev_dsk_base" ] && source "/apollo/env/DevDesktopAL2/misc/zshrc_dev_dsk_base"
-[ -f "/apollo/env/DevDesktopAL2023/misc/zshrc_dev_dsk_base" ] && source "/apollo/env/DevDesktopAL2023/misc/zshrc_dev_dsk_base"
-[ -f "/apollo/env/envImprovement/var/zshrc" ] && source "/apollo/env/envImprovement/var/zshrc"
-[ -f "/apollo/env/EnvImprovement/var/zshrc" ] && source "/apollo/env/EnvImprovement/var/zshrc"
-[ -f "$LOCAL_ADMIN_SCRIPTS/master.zshrc" ] && source "$LOCAL_ADMIN_SCRIPTS/master.zshrc"
-
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # Disable C-S and C-Q
 if [[ -t 0 && $- = *i* ]]
 then
     stty -ixon
-fi 
+fi
 
 # Disable globbing
 set -o no_extended_glob
@@ -23,12 +17,9 @@ export VISUAL='nvim'
 
 export BAT_THEME='Monokai Extended Light'
 
-export PATH="/home/$USER/.local/bin:$PATH"
-export PATH="/home/$USER/.fzf/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/.fzf/bin:$PATH"
 export PATH="$HOME/homebrew/bin:$HOME/homebrew/sbin:$PATH"
-[ -d /apollo/env/OdinTools/bin ] && export PATH=/apollo/env/OdinTools/bin:$PATH
-[ -d /apollo/env/OdinTools/bin ] && export PATH=/apollo/env/OdinTools/bin:$PATH
-[ -d "$HOME/.toolbox/bin" ] && export PATH="$HOME/.toolbox/bin:$PATH"
 
 # use ripgrep with fzf
 export FZF_DEFAULT_COMMAND='rg --files --no-ignore-vcs --hidden 2>/dev/null'
@@ -44,15 +35,6 @@ alias rustfmt='~/fbsource/tools/third-party/rustfmt/rustfmt'
 alias jfds='jf submit --draft --stack -u'
 alias jfd='jf submit --draft -u'
 alias et='et -p 2022'
-alias wp='cd ~/workplace'
-
-alias bbf="brazil-build format"
-alias bbr="brazil-build release"
-alias bbt="brazil-build test"
-alias bre=brazil-runtime-exec
-alias brp="brazil-runtime-exec python"
-alias bte=brazil-test-exec
-alias btp="brazil-test-exec pytest -k"
 
 alias g="git"
 
@@ -65,21 +47,10 @@ alias proxycurl='curl -x fwdproxy:8080'
 # Bash completion: D33783636
 # export BUCK_COMPLETION_GUESS_TARGETS=1
 
-# if you wish to use IMDS set AWS_EC2_METADATA_DISABLED=false
-
-export AWS_EC2_METADATA_DISABLED=true
-
-PATH=$PATH:/apollo/env/NRE-Desktop/bin
-export PATH
-
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-# Activate mise so node (installed via RtxNode AL2-compatible build) is on PATH.
-# Pyright-python's nodeenv bundles an official Node binary that requires
-# GLIBC 2.27/2.28, which AL2 lacks. Putting mise's node on PATH makes
-# pyright-python use it instead of the broken bundled one.
 if command -v mise >/dev/null 2>&1; then
     eval "$(mise activate zsh)"
 fi
@@ -87,12 +58,9 @@ fi
 source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
 
 [ -s "/home/linuxbrew/.linuxbrew/bin/brew" ] && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+[ -s "/opt/homebrew/bin/brew" ] && eval "$(/opt/homebrew/bin/brew shellenv)"
 
-. "$HOME/.cargo/env"
+[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
 
-alias bl=/home/bpc/workplace/rollcage_ops_tools/src/RollcageOpsTools/src/rollcage_ops_tools/bpc/build_logs.sh
-
-export PATH="/home/bpc/workplace/Terris/src/Terris/Scripts:$PATH"
-
-# Added by AIM CLI
-export PATH="/local/home/bpc/.aim/mcp-servers:$PATH"
+# Machine-local overrides, not tracked in the dotfiles repo
+[ -f ~/.zshrc.local ] && source ~/.zshrc.local

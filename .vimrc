@@ -109,7 +109,6 @@ vim.deprecate = function() end
     }
 
 local is_fb = string.match(vim.fn.hostname(), ".*facebook.*")
-local is_amazon = string.match(vim.fn.hostname(), ".*amazon.*")
 
 if is_fb then
   require('meta.hg').setup()
@@ -133,25 +132,6 @@ vim.keymap.set('n', ']e', function()
     vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR })
 end, opts)
 vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist, opts)
-
-function bemol()
- local bemol_dir = vim.fs.find({ '.bemol' }, { upward = true, type = 'directory'})[1]
- local ws_folders_lsp = {}
- if bemol_dir then
-  local file = io.open(bemol_dir .. '/ws_root_folders', 'r')
-  if file then
-
-   for line in file:lines() do
-    table.insert(ws_folders_lsp, line)
-   end
-   file:close()
-  end
- end
-
- for _, line in ipairs(ws_folders_lsp) do
-  vim.lsp.buf.add_workspace_folder(line)
- end
-end
 
 -- Use an on_attach function to only map the following keys
 -- after the language server attaches to the current buffer
@@ -177,10 +157,6 @@ local on_attach = function(client, bufnr)
   vim.keymap.set('n', '<space>ca', vim.lsp.buf.code_action, bufopts)
   vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
   vim.keymap.set('n', '<space>f', function() vim.lsp.buf.format { async = true } end, bufopts)
-
-  if is_amazon then
-    bemol()
-  end
 end
 
 
@@ -194,13 +170,6 @@ if is_fb then
     "thriftlsp@meta",
     "pyls@meta",
     "pyre@meta",
-  }
-elseif is_amazon then
-  -- TODO: Barium for config
-  servers = {
-    "pyright",
-    "ts_ls",
-    "rust_analyzer",
   }
 else
   servers = {
@@ -218,11 +187,6 @@ vim.lsp.config('*', {
   },
   print_meta_ls_statuses_to_messages = false,
 })
-if is_amazon then
-  vim.lsp.config('rust_analyzer', {
-    cmd = { vim.fn.expand("~/.toolbox/bin/rust-analyzer") },
-  })
-end
 vim.lsp.enable(servers)
 
 local null_ls = require("null-ls")
@@ -232,27 +196,6 @@ if is_fb then
   null_ls_sources = {
     meta.null_ls.diagnostics.arclint,
     meta.null_ls.formatting.arclint,
-  }
-elseif is_amazon then
-  null_ls_sources = {
-    null_ls.builtins.formatting.black.with({
-      env = {
-        -- Please ensure env variable BRAZIL_TEST_ENV_WRAP_PKG_DIR
-        -- exists
-        BRAZIL_PACKAGE_DIR=vim.env.BRAZIL_TEST_ENV_WRAP_PKG_DIR,
-        INNER_CMD = "black"
-      },
-      command = "brazil_test_env_wrap.sh",
-    }),
-    null_ls.builtins.formatting.isort.with({
-      env = {
-        -- Please ensure env variable BRAZIL_TEST_ENV_WRAP_PKG_DIR
-        -- exists
-        BRAZIL_PACKAGE_DIR=vim.env.BRAZIL_TEST_ENV_WRAP_PKG_DIR,
-        INNER_CMD = "isort"
-      },
-      command = "brazil_test_env_wrap.sh",
-    }),
   }
 end
 
