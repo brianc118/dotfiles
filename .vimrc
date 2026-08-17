@@ -36,7 +36,11 @@ if has('nvim')
   Plug 'nvim-treesitter/nvim-treesitter-context'
   Plug 'nvim-lua/plenary.nvim'
   Plug 'nvim-telescope/telescope.nvim'
-  Plug 'jose-elias-alvarez/null-ls.nvim'
+  " jose-elias-alvarez/null-ls.nvim was archived in 2023 and the repo has since
+  " been deleted (GitHub answers 401, not 404, for repos that no longer exist),
+  " so :PlugInstall fails on it. none-ls.nvim is the community fork and keeps
+  " the `require("null-ls")` module name, so the setup block below is unchanged.
+  Plug 'nvimtools/none-ls.nvim'
   "completion
   Plug 'hrsh7th/cmp-nvim-lsp'
   Plug 'hrsh7th/cmp-buffer'
@@ -111,6 +115,19 @@ vim.deprecate = function() end
 local is_fb = string.match(vim.fn.hostname(), ".*facebook.*")
 
 if is_fb then
+  -- Meta hosts have no direct internet access. nvim-treesitter fetches parser
+  -- tarballs with curl, which ignores git's http.<url>.proxy config, so parser
+  -- installs fail with "Could not resolve host: github.com" and you silently
+  -- fall back to regex highlighting. Scope the proxy to this nvim process
+  -- rather than exporting it shell-wide, and exempt internal domains so they
+  -- keep resolving directly.
+  local no_proxy = ".fbcdn.net,.facebook.com,.thefacebook.com,.tfbnw.net,"
+    .. ".fb.com,.fburl.com,.facebook.net,.sb.fbsbx.com,localhost"
+  vim.env.http_proxy = "http://fwdproxy:8080"
+  vim.env.https_proxy = "http://fwdproxy:8080"
+  vim.env.no_proxy = no_proxy
+  vim.env.NO_PROXY = no_proxy
+
   require('meta.hg').setup()
   require("meta.lsp")
 end
