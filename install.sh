@@ -6,14 +6,55 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 PKGS_CENTOS="zsh vim neovim tmux git the_silver_searcher"
 PKGS_DEBIAN="zsh vim neovim tmux git silversearcher-ag build-essential"
 PKGS_DARWIN="zsh vim neovim tmux git tectonic wget karabiner-elements"
+# Meta devservers: installed via devfeature, not the distro package manager.
+# zsh/vim/tmux/git are already present; fzf is deliberately omitted because we
+# install it from git below to get the key bindings. tree_sitter_cli is needed
+# by nvim-treesitter to build parsers.
+FEATURES_META="neovim ripgrep bat tree_sitter_cli"
 # Build deps for compiling mosh from source
 MOSH_PKGS_DARWIN="protobuf boost pkg-config automake"
+
+# Meta devservers/OnDemands have no direct internet access; everything outbound
+# has to go via fwdproxy. Exported so git, curl, and vim-plug all pick it up.
+if command -v fwdproxy-config >/dev/null 2>&1; then
+  echo "Detected Meta host -- routing outbound traffic via fwdproxy"
+  export http_proxy=http://fwdproxy:8080
+  export https_proxy=http://fwdproxy:8080
+  export HTTP_PROXY="$http_proxy"
+  export HTTPS_PROXY="$https_proxy"
+  export no_proxy=.fbcdn.net,.facebook.com,.thefacebook.com,.tfbnw.net,.fb.com,.fburl.com,.facebook.net,.sb.fbsbx.com,localhost
+  export NO_PROXY="$no_proxy"
+
+  # The exports above only last for this script. Anything run interactively
+  # later -- `:PlugInstall` from inside nvim, a manual `git clone` -- would
+  # otherwise fail with "Could not resolve host: github.com". Persist the proxy
+  # in git config, scoped to GitHub so internal hosts (git.internal.tfbnw.net,
+  # mononoke, manifold) keep talking direct with their x509 certs.
+  #
+  # Written to ~/.gitconfig.local, NOT --global: ~/.gitconfig is a symlink into
+  # this repo, so --global would commit machine-specific config to git.
+  for host in "https://github.com/" "https://raw.githubusercontent.com/"; do
+    git config --file "$HOME/.gitconfig.local" "http.${host}.proxy" fwdproxy:8080
+  done
+fi
 
 install() {
   cd ~
   # Figure out which package manager to use
   platform=$(uname)
-  if [[ $platform == 'Linux' ]]; then
+  if [[ $platform == 'Linux' ]] && command -v devfeature >/dev/null 2>&1; then
+    # Meta devserver/OnDemand. devfeature installs without root (plain dnf
+    # needs sudo, which devservers don't grant) and `persist` re-installs the
+    # feature on every server reserved from here on -- which is what makes
+    # short-lease devvms survivable.
+    echo "Meta host detected -- installing features with devfeature"
+    for feat in $FEATURES_META; do
+      devfeature install "$feat" \
+        || { echo "WARNING: devfeature install $feat failed -- skipping"; continue; }
+      devfeature persist "$feat" \
+        || echo "WARNING: devfeature persist $feat failed (installed but not persisted)"
+    done
+  elif [[ $platform == 'Linux' ]]; then
     if [[ -f /etc/redhat-release ]]; then
       PKG_MANAGER_CMD="sudo dnf install -y"
       PKGS="$PKGS_CENTOS"
@@ -27,7 +68,12 @@ install() {
       echo "Unhandled Linux distro -- giving up forever"
       exit 1
     fi
-    $PKG_MANAGER_CMD $PKGS
+    # Install one at a time: on locked-down/Chef-managed hosts some of these
+    # aren't in the configured repos, and a single missing package would
+    # otherwise abort the whole script via `set -e`.
+    for pkg in $PKGS; do
+      $PKG_MANAGER_CMD "$pkg" || echo "WARNING: could not install $pkg -- skipping"
+    done
   elif [[ $platform == 'Darwin' ]]; then
     if ! command -v brew &> /dev/null; then
       echo "Installing homebrew"
@@ -71,8 +117,10 @@ install() {
 post_install () {
   echo "Post Install"
   cd "$DIR"
-  command -v vim  >/dev/null && vim  -es -u ~/.vimrc +PlugInstall +qa
-  command -v nvim >/dev/null && nvim -es -u ~/.config/nvim/init.vim +PlugInstall +qa
+  # vim-plug exits non-zero from silent-ex mode even on a clean install, so
+  # don't let `set -e` fail the whole script (and any automation calling it).
+  command -v vim  >/dev/null && { vim  -es -u ~/.vimrc                 +PlugInstall +qa </dev/null || true; }
+  command -v nvim >/dev/null && { nvim -es -u ~/.config/nvim/init.vim  +PlugInstall +qa </dev/null || true; }
 
   echo "You may also want to install"
   echo "bat"
