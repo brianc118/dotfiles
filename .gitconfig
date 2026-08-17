@@ -31,14 +31,8 @@
 	required = true
 	clean = git-lfs clean -- %f
 
-# Machine-local overrides, not tracked in the dotfiles repo.
-# On Meta devservers this holds the x509 client-cert config for internal
-# git hosts (git.internal.tfbnw.net, mononoke-git-lfs, manifold).
-# Listed last so local settings win.
-#
-# NOTE: ~/.gitconfig is a symlink into this repo, so `git config --global`
-# writes HERE. Meta tooling does exactly that to add x509 client-cert blocks
-# for internal hosts. Those are machine-specific -- keep them in
-# ~/.gitconfig.local and periodically check `git diff` for ones that leaked in.
-[include]
-	path = ~/.gitconfig.local
+# This file is INCLUDED by ~/.gitconfig, not symlinked to it -- install.sh sets
+# that up. So `git config --global` writes to the real ~/.gitconfig and never
+# touches this tracked file, which keeps machine-specific settings (x509 client
+# certs for internal hosts, proxies, per-host emails) out of version control.
+# Put machine-local settings in ~/.gitconfig; they win, being included first.

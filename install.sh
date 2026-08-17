@@ -14,6 +14,48 @@ FEATURES_META="neovim ripgrep bat tree_sitter_cli"
 # Build deps for compiling mosh from source
 MOSH_PKGS_DARWIN="protobuf boost pkg-config automake"
 
+# ~/.gitconfig must be a REAL file that *includes* the copy in this repo -- not
+# a symlink to it. `git config --global` writes to ~/.gitconfig, and plenty of
+# things call it: Meta tooling adds x509 client-cert blocks for internal git
+# hosts, and `git config --global user.email ...` is the first thing anyone
+# reaches for. With a symlink those machine-specific values land in a tracked
+# file and get committed by accident.
+#
+# The include goes at the top, so anything appended later (which is where
+# --global writes) takes precedence -- git applies config in file order.
+# Runs before anything else here, because the proxy setup below uses --global.
+ensure_real_gitconfig() {
+  if [[ -L "$HOME/.gitconfig" ]]; then
+    echo "Converting ~/.gitconfig from symlink to real file"
+    rm -f "$HOME/.gitconfig"
+  fi
+
+  if [[ ! -e "$HOME/.gitconfig" ]]; then
+    cat > "$HOME/.gitconfig" <<EOF
+# Machine-local git config -- NOT tracked in the dotfiles repo.
+# The shared config is included below; put host-specific settings (x509 certs,
+# proxies, work email) here, or just let \`git config --global\` append them.
+[include]
+	path = $DIR/.gitconfig
+EOF
+  fi
+
+  # Idempotent: only add the include if it isn't already there.
+  if ! git config --global --get-all include.path 2>/dev/null \
+    | grep -qxF "$DIR/.gitconfig"; then
+    git config --global --add include.path "$DIR/.gitconfig"
+  fi
+
+  # Migrate the older ~/.gitconfig.local split into ~/.gitconfig, which is now
+  # itself the machine-local file. Kept as a no-op once done.
+  if [[ -f "$HOME/.gitconfig.local" ]]; then
+    echo "Merging legacy ~/.gitconfig.local into ~/.gitconfig"
+    cat "$HOME/.gitconfig.local" >> "$HOME/.gitconfig"
+    mv "$HOME/.gitconfig.local" "$HOME/.gitconfig.local.migrated"
+  fi
+}
+ensure_real_gitconfig
+
 # Meta devservers/OnDemands have no direct internet access; everything outbound
 # has to go via fwdproxy. Exported so git, curl, and vim-plug all pick it up.
 if command -v fwdproxy-config >/dev/null 2>&1; then
@@ -31,10 +73,10 @@ if command -v fwdproxy-config >/dev/null 2>&1; then
   # in git config, scoped to GitHub so internal hosts (git.internal.tfbnw.net,
   # mononoke, manifold) keep talking direct with their x509 certs.
   #
-  # Written to ~/.gitconfig.local, NOT --global: ~/.gitconfig is a symlink into
-  # this repo, so --global would commit machine-specific config to git.
+  # --global is safe now that ensure_real_gitconfig has made ~/.gitconfig a
+  # real, untracked file.
   for host in "https://github.com/" "https://raw.githubusercontent.com/"; do
-    git config --file "$HOME/.gitconfig.local" "http.${host}.proxy" fwdproxy:8080
+    git config --global "http.${host}.proxy" fwdproxy:8080
   done
 fi
 
@@ -129,7 +171,7 @@ post_install () {
 symlinks () {
   echo "Symlinks"
   cd "$DIR"
-  ln -sf "$DIR/.gitconfig" ~
+  # NB: .gitconfig is deliberately not symlinked -- see ensure_real_gitconfig.
   ln -sf "$DIR/.zshrc" ~
   ln -sf "$DIR/.zpreztorc" ~
   ln -sf "$DIR/.vimrc" ~
