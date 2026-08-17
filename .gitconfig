@@ -30,3 +30,12 @@
 	process = git-lfs filter-process
 	required = true
 	clean = git-lfs clean -- %f
+
+# Machine-local overrides, not tracked in the dotfiles repo.
+# Listed last so local settings win.
+#
+# NOTE: ~/.gitconfig is a symlink into this repo, so `git config --global`
+# writes HERE. Keep machine-specific settings in ~/.gitconfig.local and
+# periodically check `git diff` for ones that leaked in.
+[include]
+	path = ~/.gitconfig.local
