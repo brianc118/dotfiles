@@ -32,7 +32,11 @@ if has('nvim')
   Plug 'nvim-tree/nvim-web-devicons'
   Plug 'folke/trouble.nvim'
   "magical highlighting
-  Plug 'nvim-treesitter/nvim-treesitter', {'branch': 'master', 'do': ':TSUpdate'}
+  if has('nvim-0.12')
+    Plug 'nvim-treesitter/nvim-treesitter', {'branch': 'main', 'do': ':TSUpdate'}
+  else
+    Plug 'nvim-treesitter/nvim-treesitter', {'branch': 'master', 'do': ':TSUpdate'}
+  endif
   Plug 'nvim-treesitter/nvim-treesitter-context'
   Plug 'nvim-lua/plenary.nvim'
   Plug 'nvim-telescope/telescope.nvim'
@@ -115,19 +119,17 @@ vim.deprecate = function() end
 local is_fb = string.match(vim.fn.hostname(), ".*facebook.*")
 
 if is_fb then
-  -- No direct internet access here. nvim-treesitter fetches parser tarballs
-  -- with curl, which ignores git's http.<url>.proxy config, so parser installs
-  -- fail and you silently fall back to regex highlighting. Scope the proxy to
-  -- this nvim process rather than exporting it shell-wide, and exempt internal
-  -- domains so they keep resolving directly.
-  local no_proxy = ".fbcdn.net,.facebook.com,.thefacebook.com,.tfbnw.net,"
-    .. ".fb.com,.fburl.com,.facebook.net,.sb.fbsbx.com,localhost"
-  vim.env.http_proxy = "http://fwdproxy:8080"
-  vim.env.https_proxy = "http://fwdproxy:8080"
-  vim.env.no_proxy = no_proxy
-  vim.env.NO_PROXY = no_proxy
+  -- No direct internet access here, and nvim-treesitter downloads parsers with
+  -- curl, which cannot see git's proxy config. The proxy needs a client cert,
+  -- which an http_proxy env var cannot carry, and install.prefer_git breaks
+  -- whenever nvim runs as the git commit editor. A curlrc can carry both, so
+  -- install.sh generates one; point CURL_HOME at it for this nvim process only.
+  local curlrc_dir = vim.fn.expand("~/.config/fwdproxy-curl")
+  if vim.fn.filereadable(curlrc_dir .. "/.curlrc") == 1 then
+    vim.env.CURL_HOME = curlrc_dir
+  end
 
-  require('meta.hg').setup()
+  require("meta").setup()
   require("meta.lsp")
 end
 
@@ -148,6 +150,62 @@ vim.keymap.set('n', ']e', function()
     vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR })
 end, opts)
 vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist, opts)
+
+local function meta_project_id(bufnr)
+  if not is_fb then
+    return nil
+  end
+
+  local ok, meta_util = pcall(require, "meta.util")
+  if not ok then
+    return nil
+  end
+
+  local config = select(1, meta_util.arc.get_config_and_project_root(
+    vim.api.nvim_buf_get_name(bufnr)
+  ))
+  return meta_util.arc.get_project_id_from_config(config)
+end
+
+local function format_buffer()
+  local bufnr = vim.api.nvim_get_current_buf()
+  local clients = vim.lsp.get_clients({
+    bufnr = bufnr,
+    method = "textDocument/formatting",
+  })
+  local project_id = meta_project_id(bufnr)
+  local use_linttool = project_id == "fbsource" or project_id == "www"
+  local selected = {}
+
+  for _, client in ipairs(clients) do
+    if not use_linttool or client.name == "linttool@meta" then
+      selected[client.id] = true
+    end
+  end
+
+  if vim.tbl_isempty(selected) then
+    local message = use_linttool
+      and "linttool formatter is not attached yet"
+      or "no formatter is attached to this buffer"
+    vim.notify(message, vim.log.levels.WARN)
+    return
+  end
+
+  vim.lsp.buf.format({
+    bufnr = bufnr,
+    async = true,
+    timeout_ms = 30000,
+    filter = function(client)
+      return selected[client.id] == true
+    end,
+  })
+end
+
+vim.keymap.set('n', '<space>f', format_buffer, {
+  noremap = true,
+  silent = true,
+  desc = "Format buffer",
+})
 
 -- Use an on_attach function to only map the following keys
 -- after the language server attaches to the current buffer
@@ -172,7 +230,6 @@ local on_attach = function(client, bufnr)
   vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, bufopts)
   vim.keymap.set('n', '<space>ca', vim.lsp.buf.code_action, bufopts)
   vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
-  vim.keymap.set('n', '<space>f', function() vim.lsp.buf.format { async = true } end, bufopts)
 end
 
 
@@ -184,8 +241,8 @@ if is_fb then
     "cppls@meta", 
     "rust-analyzer@meta", 
     "thriftlsp@meta",
-    "pyls@meta",
-    "pyre@meta",
+    "pyrefly@meta",
+    "linttool@meta",
   }
 else
   servers = {
@@ -203,6 +260,18 @@ vim.lsp.config('*', {
   },
   print_meta_ls_statuses_to_messages = false,
 })
+if is_fb then
+  -- Override the default command, which passes a flag the wrapper rejects.
+  vim.lsp.config("linttool@meta", {
+    cmd = function(dispatchers, config)
+      return vim.lsp.rpc.start(
+        { "arc", "linttool", "lsp", "--caller=neovim" },
+        dispatchers,
+        { cwd = config.root_dir }
+      )
+    end,
+  })
+end
 vim.lsp.enable(servers)
 
 local null_ls = require("null-ls")
@@ -230,7 +299,6 @@ null_ls.setup({
         return on_attach(client, bufnr)
   end,
   sources = null_ls_sources,
-  debug = true
 })
 
 vim.lsp.handlers['window/showMessage'] = function(_, result, ctx)
@@ -302,41 +370,78 @@ vim.opt.completeopt = { "menu", "menuone", "noselect" }
       })
 
 
---tree-sitter
-require'nvim-treesitter.configs'.setup {
-  -- A list of parser names, or "all"
-  ensure_installed = { "c", "lua", "vim", "vimdoc", "query", "cpp", "rust", "python" },
-
-  -- Install parsers synchronously (only applied to `ensure_installed`)
-  sync_install = false,
-
-  highlight = {
-    enable = true,
-    -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
-    -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
-    -- Using this option may slow down your editor, and you may see some duplicate highlights.
-    -- Instead of true it can also be a list of languages
-    additional_vim_regex_highlighting = false,
-  },
-  indent = {
-    enable = true,
-  },
+-- tree-sitter's main branch is an incompatible rewrite for Neovim 0.12;
+-- master remains the supported branch for Neovim 0.10 and 0.11.
+local treesitter_languages = {
+  "c", "lua", "vim", "vimdoc", "query", "cpp", "rust", "python",
 }
+vim.g.dotfiles_treesitter_languages = treesitter_languages
 
-require'treesitter-context'.setup{
-  enable = true, -- Enable this plugin (Can be enabled/disabled later via commands)
-  max_lines = 1, -- How many lines the window should span. Values <= 0 mean no limit.
-  min_window_height = 0, -- Minimum editor window height to enable context. Values <= 0 mean no limit.
-  line_numbers = true,
-  multiline_threshold = 20, -- Maximum number of lines to show for a single context
-  trim_scope = 'outer', -- Which context lines to discard if `max_lines` is exceeded. Choices: 'inner', 'outer'
-  mode = 'cursor',  -- Line used to calculate context. Choices: 'cursor', 'topline'
-  -- Separator between context and content. Should be a single character string, like '-'.
-  -- When separator is set, the context will only show up when there are at least 2 lines above cursorline.
-  separator = nil,
-  zindex = 20, -- The Z-index of the context window
-  on_attach = nil, -- (fun(buf: integer): boolean) return false to disable attaching
-}
+local treesitter_ready = false
+if vim.fn.has("nvim-0.12") == 1 then
+  local ok, treesitter = pcall(require, "nvim-treesitter")
+  if ok and type(treesitter.setup) == "function" then
+    treesitter.setup {
+      install_dir = vim.fn.stdpath("data") .. "/site",
+    }
+
+    local enabled = {}
+    for _, language in ipairs(treesitter_languages) do
+      enabled[language] = true
+    end
+
+    local group = vim.api.nvim_create_augroup("UserTreesitter", { clear = true })
+    vim.api.nvim_create_autocmd("FileType", {
+      group = group,
+      callback = function(args)
+        local language = vim.treesitter.language.get_lang(vim.bo[args.buf].filetype)
+        if language and enabled[language]
+            and pcall(vim.treesitter.start, args.buf, language) then
+          vim.bo[args.buf].indentexpr =
+            "v:lua.require'nvim-treesitter'.indentexpr()"
+        end
+      end,
+    })
+    treesitter_ready = true
+  else
+    vim.schedule(function()
+      vim.notify(
+        "Neovim 0.12 requires nvim-treesitter main; run :PlugUpdate nvim-treesitter",
+        vim.log.levels.WARN
+      )
+    end)
+  end
+else
+  require("nvim-treesitter.configs").setup {
+    ensure_installed = treesitter_languages,
+    sync_install = false,
+    highlight = {
+      enable = true,
+      additional_vim_regex_highlighting = false,
+    },
+    indent = {
+      enable = true,
+    },
+  }
+  treesitter_ready = true
+end
+
+if treesitter_ready then
+  require'treesitter-context'.setup{
+    enable = true, -- Enable this plugin (Can be enabled/disabled later via commands)
+    max_lines = 1, -- How many lines the window should span. Values <= 0 mean no limit.
+    min_window_height = 0, -- Minimum editor window height to enable context. Values <= 0 mean no limit.
+    line_numbers = true,
+    multiline_threshold = 20, -- Maximum number of lines to show for a single context
+    trim_scope = 'outer', -- Which context lines to discard if `max_lines` is exceeded. Choices: 'inner', 'outer'
+    mode = 'cursor',  -- Line used to calculate context. Choices: 'cursor', 'topline'
+    -- Separator between context and content. Should be a single character string, like '-'.
+    -- When separator is set, the context will only show up when there are at least 2 lines above cursorline.
+    separator = nil,
+    zindex = 20, -- The Z-index of the context window
+    on_attach = nil, -- (fun(buf: integer): boolean) return false to disable attaching
+  }
+end
 
 require("trouble").setup {
   -- your configuration comes here
@@ -492,15 +597,17 @@ endfunction
 """-------------------------------------------"""
 
 "FZF
+" Avoid opening a file on every cursor movement through the result list.
+let g:fzf_preview_window = ['hidden', 'ctrl-/']
 nnoremap <silent> <C-b> :Buffers<CR>
-nnoremap <silent> <C-g>g :Rg<CR>
+" Wait for a search term instead of running ripgrep with an empty pattern.
+nnoremap <C-g>g :Rg<Space>
 "search Rg with word under cursor
 nnoremap <silent> <C-g>r :Rg <C-R><C-W><CR>
 nnoremap <silent> <C-g>c :Commands<CR>
 nnoremap <silent> <C-g>L :Lines<CR>
 nnoremap <silent> <C-g>l :BLines<CR>
 nnoremap <silent> <C-p> :Files<CR>
-nmap <C-P> :FZF<CR>
 
 """-------------------------------------------"""
 """             LANGUAGE SUPPORT              """

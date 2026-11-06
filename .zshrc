@@ -1,3 +1,7 @@
+# System-wide shell config, where present. Goes first: it runs compinit, and
+# prezto (sourced below) expects to run after it.
+[ -r /usr/facebook/ops/rc/master.zshrc ] && source /usr/facebook/ops/rc/master.zshrc
+
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # Disable C-S and C-Q
@@ -21,14 +25,16 @@ export PATH="$HOME/.local/bin:$PATH"
 export PATH="$HOME/.fzf/bin:$PATH"
 export PATH="$HOME/homebrew/bin:$HOME/homebrew/sbin:$PATH"
 
-# use ripgrep with fzf
-export FZF_DEFAULT_COMMAND='rg --files --no-ignore-vcs --hidden 2>/dev/null'
-
 alias fbcode='cd ~/fbsource/fbcode'
 alias fbsource='cd ~/fbsource'
 alias fbcode2='cd ~/fbsource2/fbcode'
 alias fbsource2='cd ~/fbsource2'
 alias fbcode3='cd ~/fbsource3/fbcode'
+alias fbcode4='cd ~/fbsource4/fbcode'
+alias fbcode5='cd ~/fbsource5/fbcode'
+alias fbcode6='cd ~/fbsource6/fbcode'
+alias fbcode7='cd ~/fbsource7/fbcode'
+alias fbcode8='cd ~/fbsource8/fbcode'
 alias fbsource3='cd ~/fbsource3'
 alias opsfiles='cd ~/opsfiles'
 alias rustfmt='~/fbsource/tools/third-party/rustfmt/rustfmt'
@@ -55,12 +61,28 @@ if command -v mise >/dev/null 2>&1; then
     eval "$(mise activate zsh)"
 fi
 
-source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
+[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ] && source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
 
 [ -s "/home/linuxbrew/.linuxbrew/bin/brew" ] && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 [ -s "/opt/homebrew/bin/brew" ] && eval "$(/opt/homebrew/bin/brew shellenv)"
 
 [ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
+
+# Use the fastest available ignore-aware file walker. Avoid hidden files and
+# ignored build output by default; both can make fuzzy finding unusable in
+# large repositories. Debian installs fd as `fdfind`.
+if command -v fd >/dev/null 2>&1; then
+    export FZF_DEFAULT_COMMAND='fd --type f --strip-cwd-prefix'
+    export FZF_CTRL_T_COMMAND='fd --strip-cwd-prefix'
+    export FZF_ALT_C_COMMAND='fd --type d --strip-cwd-prefix'
+elif command -v fdfind >/dev/null 2>&1; then
+    export FZF_DEFAULT_COMMAND='fdfind --type f --strip-cwd-prefix'
+    export FZF_CTRL_T_COMMAND='fdfind --strip-cwd-prefix'
+    export FZF_ALT_C_COMMAND='fdfind --type d --strip-cwd-prefix'
+elif command -v rg >/dev/null 2>&1; then
+    export FZF_DEFAULT_COMMAND='rg --files'
+    export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+fi
 
 # Machine-local overrides, not tracked in the dotfiles repo
 [ -f ~/.zshrc.local ] && source ~/.zshrc.local
